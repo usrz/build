@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+
+  <!--+====================================================================+
+      | COMPILATION MACRO                                                  |
+      +=================================================================== + -->
+
+  <macrodef name="compile" >
+    <attribute name="sourcedir"/>
+    <attribute name="targetdir"/>
+    <attribute name="classpathref"/>
+
+    <sequential>
+      <mkdir dir="@{targetdir}"/>
+
+      <javac srcdir="@{sourcedir}"
+             destdir="@{targetdir}"
+             classpathref="@{classpathref}"
+             includeantruntime="false"
+             debug="true" >
+        <include name="**/*.java"/>
+      </javac>
+
+      <copy todir="@{targetdir}"
+            includeEmptyDirs="false">
+        <fileset dir="@{sourcedir}"
+                 excludes="**/*.java"/>
+      </copy>
+    </sequential>
+  </macrodef>
+
+  <!--+====================================================================+
+      | COMPILATION TASKS                                                  |
+      +=================================================================== + -->
+  
+  <!-- Compile main sources -->
+  <target name="compile.main"
+          depends="resolve"
+          unless="task.executed.compile.main">
+    <property name="task.executed.compile.main" value="true"/>
+    <compile sourcedir="${sourcedir}/main"
+             targetdir="${targetdir}/main"
+             classpathref="classpath.main" />
+  </target>
+
+  <!-- Compile test sources -->
+  <target name="compile.test"
+          depends="resolve,compile.main"
+          unless="task.executed.compile.test">
+    <property name="task.executed.compile.test" value="true"/>
+
+    <!-- Add the "main" classes to the test path -->
+    <path id="classpath.test.compile">
+      <path refid="classpath.test" />
+      <pathelement path="${targetdir}/main"/>
+    </path>
+
+    <!-- Compile the test sources -->
+    <compile sourcedir="${sourcedir}/test"
+             targetdir="${targetdir}/test"
+             classpathref="classpath.test.compile"/>
+  </target>
+
+  <!-- Compile all sources -->
+  <target name="compile"
+          depends="resolve,compile.main,compile.test"
+          description="Compile all source files"
+          unless="task.executed.compile">
+    <property name="task.executed.compile" value="true"/>
+  </target>
+
+</project>

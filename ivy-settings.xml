@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ivysettings>
+
+  <!-- Where to put library files once we retrieve them -->
+  <property name="ivy.retrieve.pattern"
+            value="${basedir}/lib/[organisation].[artifact]-[revision]-[type].[ext]"/>
+
+  <!-- Where the build system places JARs upon building -->
+  <property name="ivy.publish.src.artifacts.pattern"
+            value="${targetdir}/publish/[artifact]-[revision]-[type].[ext]"/>
+
+  <settings defaultResolver="libraries"/>
+
+  <caches defaultCacheDir="${basedir}/.ivycache"
+          ivyPattern="[organisation]/[module]/[revision]/ivy.xml"
+          artifactPattern="[organisation]/[module]/[revision]/[organisation].[artifact]-[revision]-[type].[ext]" />
+
+  <resolvers>
+
+    <filesystem name="libraries" checkmodified="true">
+      <ivy      pattern="${ivy.libraries}/[organisation]/[module]/[revision]/ivy.xml" />
+      <artifact pattern="${ivy.libraries}/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
+    </filesystem>
+
+    <filesystem name="publications" checksums="">
+      <ivy      pattern="${ivy.publications}/[organisation]/[module]/[revision]/ivy.xml" />
+      <artifact pattern="${ivy.publications}/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
+    </filesystem>
+
+  </resolvers>
+</ivysettings>

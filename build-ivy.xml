@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <!--+====================================================================+
+      | LOAD IVY                                                           |
+      +=================================================================== + -->
+
+  <!-- Load Ivy's classes -->
+  <taskdef resource="org/apache/ivy/ant/antlib.xml"
+           uri="antlib:org.apache.ivy.ant"
+           classpath="${builddir}/ivy-2.3.0.jar" />
+
+  <!-- Initialize Ivy -->
+  <ivy:configure file="${builddir}/ivy-settings.xml" />
+
+  <!--+====================================================================+
+      | IVY-RELATED TASKS                                                  |
+      +=================================================================== + -->
+
+  <!-- Resolve all our dependencies -->
+  <target name="resolve"
+          unless="task.executed.resolve">
+    <property name="task.executed.resolve" value="true"/>
+          
+    <!-- Resolve Ivy's descriptor fully -->
+    <ivy:resolve />
+    <ivy:cachepath pathid="classpath.main"
+                   conf="default"
+                   type="bin" />
+    <ivy:cachepath pathid="classpath.test"
+                   conf="test"
+                   type="bin" />
+  </target>
+  
+  <!-- Prepare Eclipse's .classpath file -->
+  <target name="eclipse"
+          depends="resolve"
+          description="Create Eclipse's .classpath file"
+          unless="task.executed.eclipse">
+    <property name="task.executed.eclipse" value="true"/>
+
+    <mkdir dir="${targetdir}" />
+    <ivy:artifactreport tofile="${targetdir}/artifacts.xml"
+                        log="downloadonly"/>
+    <xslt style="${builddir}/iby-eclipse.xslt"
+          in="${targetdir}/artifacts.xml"
+          out="${basedir}/.classpath" />
+  </target>
+    
+
+</project>
+

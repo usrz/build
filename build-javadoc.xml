@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+
+  <!--+====================================================================+
+      | JAVADOC GENERATION                                                 |
+      +=================================================================== + -->
+  <target name="javadoc"
+          depends="resolve"
+          description="Prepare JavaDOC of main sources"
+          unless="task.executed.javadoc">
+    <property name="task.executed.javadoc" value="true"/>
+    <javadoc sourcepath="${sourcedir}/main"
+            destdir="${targetdir}/docs"
+            author="true"
+            version="true"
+            use="true"
+            classpathref="classpath.main"
+            windowtitle="${description}">
+        <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+      </javadoc>
+    
+  </target>
+</project>

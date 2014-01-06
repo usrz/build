@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <target name="test"
+          depends="compile"
+          description="Run TestNG tests"
+          unless="task.executed.test">
+    <property name="task.executed.test" value="true"/>     
+    
+    <!-- Cache the path for TestNG (latest) to define our task -->
+    <ivy:cachepath organisation="org.testng"
+                   module="testng"
+                   inline="true"
+                   conf="default"
+                   type="bin"
+                   transitive="false"
+                   log="download-only"
+                   revision="latest.release"
+                   pathid="classpath.testng"/>
+
+    <!-- Define our "testng" task -->
+    <taskdef resource="testngtasks" classpathref="classpath.testng"/>
+
+    <!-- Create a class path for running tests -->
+    <path id="classpath.test.execute">
+       <path refid="classpath.main"/>
+       <path refid="classpath.test"/>
+       <pathelement path="${targetdir}/main"/>
+       <pathelement path="${targetdir}/test"/>
+    </path>                   
+
+    <!-- Run tests -->
+    <testng classpathref="classpath.test.execute"
+            outputDir="${targetdir}/testng"
+            haltOnFailure="true"
+            suitename="suite"
+            verbose="2">
+      <classfileset dir="${targetdir}/test"
+                    includes="**/*Test.class" />
+    </testng>
+  </target>
+</project>

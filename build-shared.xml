@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
+  
+  <!-- Basic directory properties -->
+  <property name="builddir" value="${basedir}/build" />
+  <property name="sourcedir" value="${basedir}/source" />
+  <property name="targetdir" value="${basedir}/target" />
+
+  <!-- Import build files for specific tasks -->
+  <import file="build-ivy.xml" />
+  <import file="build-compile.xml" />
+  <import file="build-javadoc.xml" />
+  <import file="build-test.xml" />
+
+  <!-- Cleanup tasks -->
+  <target name="clean"
+          description="Cleanup all targets"
+          unless="task.executed.clean">
+    <property name="task.executed.clean" value="true"/>
+    <delete dir="${targetdir}" />
+  </target>
+
+</project>
