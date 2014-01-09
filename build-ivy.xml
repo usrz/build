@@ -43,7 +43,7 @@
     <mkdir dir="${targetdir}" />
     <ivy:artifactreport tofile="${targetdir}/artifacts.xml"
                         log="downloadonly"/>
-    <xslt style="${builddir}/iby-eclipse.xslt"
+    <xslt style="${builddir}/ivy-eclipse.xslt"
           in="${targetdir}/artifacts.xml"
           out="${basedir}/.classpath" />
   </target>
