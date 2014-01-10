@@ -46,6 +46,18 @@
     <ivy:cachepath pathid="classpath.test"
                    conf="test"
                    type="bin" />
+
+    <!-- Calculate a timestamp for publishing -->
+    <tstamp>
+      <format property="ivy.timestamp" pattern="yyyyMMddHHmmss"/>
+    </tstamp>
+    
+    <!-- Set our publish revision -->
+    <condition property="ivy.revision.publish" value="${ivy.revision}">
+      <equals arg1="${ivy.status}" arg2="release"/>
+    </condition>
+    <property name="ivy.revision.publish" value="${ivy.revision}-${ivy.timestamp}"/>
+
   </target>
   
   <!-- Prepare Eclipse's .classpath file -->
