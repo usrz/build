@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--+=======================================================================+
+    | Copyright 2014 USRZ.com and Pier Paolo Fumagalli                      |
+    +- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+    | Licensed under the Apache License, Version 2.0 (the "License");       |
+    | you may not use this file except in compliance with the License.      |
+    | You may obtain a copy of the License at                               |
+    |                                                                       |
+    |  http://www.apache.org/licenses/LICENSE-2.0                           |
+    |                                                                       |
+    | Unless required by applicable law or agreed to in writing, software   |
+    | distributed under the License is distributed on an "AS IS" BASIS,     |
+    | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or       |
+    | implied. See the License for the specific language governing          |
+    | permissions and limitations under the License.                        |
+    +=======================================================================+-->
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <!-- Resolve and prepare the distribution directory -->
+  <target name="dist.prepare"
+          depends="resolve"
+          unless="task.executed.dist.prepare">
+    <property name="task.executed.dist.prepare" value="true"/>
+    <mkdir dir="${targetdir}/dist"/>
+  </target>
+
+  <!-- Archive sources -->
+  <target name="dist.sources"
+          depends="dist.prepare"
+          unless="task.executed.dist.sources">
+    <property name="task.executed.dist.sources" value="true"/>
+    <zip destfile="${targetdir}/dist/${ivy.module}-src.zip"
+         basedir="${sourcedir}/main"
+         filesonly="true" />
+  </target>
+
+  <!-- Archive javadocs -->
+  <target name="dist.javadoc"
+          depends="dist.prepare,javadoc"
+          unless="task.executed.dist.javadoc">
+    <property name="task.executed.dist.javadoc" value="true"/>
+    <zip destfile="${targetdir}/dist/${ivy.module}-doc.zip"
+         basedir="${targetdir}/docs"
+         filesonly="true" />
+  </target>
+
+  <!-- Archive classes -->
+  <target name="dist.classes"
+          depends="dist.prepare,compile"
+          unless="task.executed.dist.classes">
+    <property name="task.executed.dist.classes" value="true"/>
+    <jar destfile="${targetdir}/dist/${ivy.module}-bin.jar"
+         basedir="${targetdir}/main"
+         filesonly="true">
+      <manifest>
+        <attribute name="Implementation-Vendor" value="${ivy.organisation}"/>
+        <attribute name="Implementation-Title" value="${ivy.module}"/>
+        <attribute name="Implementation-Version" value="${ivy.revision}"/>
+      </manifest>
+    </jar>
+  </target>
+  
+  <!--+====================================================================+
+      | PREPARE ARCHIVES FOR A FULL DISTRIBUTION                           |
+      +=================================================================== + -->
+  <target name="dist"
+          depends="dist.sources,dist.javadoc,dist.classes"
+          description="Prepare archives for distribution"
+          unless="task.executed.dist">
+    <property name="task.executed.dist" value="true"/>
+
+    <ivy:publish resolver="publications"
+                 forcedeliver="true"
+                 pubrevision="${ivy.revision.publish}"
+                 pubdate="${ivy.timestamp}"
+                 conf="*(public)">
+       <artifacts pattern="${targetdir}/dist/[artifact]-[type].[ext]" />
+    </ivy:publish>
+
+    <echoproperties/>
+  </target>
+
+</project>

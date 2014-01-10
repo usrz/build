@@ -27,6 +27,7 @@
   <import file="build-compile.xml" />
   <import file="build-javadoc.xml" />
   <import file="build-test.xml" />
+  <import file="build-dist.xml" />
 
   <!-- Cleanup tasks -->
   <target name="clean"
