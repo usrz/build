@@ -33,10 +33,10 @@
 
   <resolvers>
 
-    <filesystem name="libraries" checkmodified="true">
-      <ivy      pattern="${ivy.libraries}/[organisation]/[module]/[revision]/ivy.xml" />
-      <artifact pattern="${ivy.libraries}/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
-    </filesystem>
+    <url name="libraries" checkmodified="true">
+      <ivy      pattern="http://dev.usrz.com/libraries/[organisation]/[module]/[revision]/ivy.xml" />
+      <artifact pattern="http://dev.usrz.com/libraries/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
+    </url>
 
     <filesystem name="publications" checksums="">
       <ivy      pattern="${ivy.publications}/[organisation]/[module]/[revision]/ivy.xml" />
