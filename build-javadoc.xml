@@ -17,23 +17,35 @@
 
 <project>
 
-  <!--+====================================================================+
-      | JAVADOC GENERATION                                                 |
-      +=================================================================== + -->
-  <target name="javadoc"
-          depends="resolve"
-          description="Prepare JavaDOC of main sources"
-          unless="task.executed.javadoc">
-    <property name="task.executed.javadoc" value="true"/>
+  <target name="javadoc.check"
+          unless="task.executed.javadoc.check">
+    <property name="task.executed.javadoc.check" value="true"/>
+    <uptodate property="task.executed.javadoc.generate">
+      <srcfiles dir= "${sourcedir}/main" includes="**/*"/>
+      <mapper type="merge" to="${targetdir}/docs/index.html"/>
+    </uptodate>
+  </target>
+
+  <target name="javadoc.generate"
+          unless="task.executed.javadoc.generate">
+    <property name="task.executed.javadoc.generate" value="true"/>
     <javadoc sourcepath="${sourcedir}/main"
             destdir="${targetdir}/docs"
             author="true"
             version="true"
             use="true"
-            classpathref="classpath.main"
-            windowtitle="${description}">
+            classpathref="classpath.main">
         <link href="http://docs.oracle.com/javase/7/docs/api/"/>
       </javadoc>
-    
+  </target>
+
+  <!--+====================================================================+
+      | JAVADOC GENERATION                                                 |
+      +=================================================================== + -->
+  <target name="javadoc"
+          depends="resolve,javadoc.check,javadoc.generate"
+          description="Prepare JavaDOC of main sources"
+          unless="task.executed.javadoc">
+    <property name="task.executed.javadoc" value="true"/>
   </target>
 </project>
