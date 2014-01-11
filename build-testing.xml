@@ -48,6 +48,7 @@
     <!-- Run tests -->
     <testng classpathref="classpath.test.execute"
             outputDir="${targetdir}/testng"
+            excludedgroups="local"
             haltOnFailure="true"
             suitename="suite"
             verbose="2">
