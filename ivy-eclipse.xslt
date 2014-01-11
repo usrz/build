@@ -45,7 +45,7 @@
   <xsl:template match="module">
     <xsl:apply-templates select="artifact[@type='bin']"/>
   </xsl:template>
-  
+
   <!-- Artifacts -->
   <xsl:template match="artifact">
     <xsl:if test="@type='bin'">
@@ -56,7 +56,7 @@
           <xsl:attribute name="path">
             <xsl:value-of select="cache-location"/>
           </xsl:attribute>
-          
+
           <xsl:variable name="name" select="@name"/>
 
           <!-- If we have a "src" artifact, link in the sources -->
@@ -72,7 +72,7 @@
               <attribute name="javadoc_location" value="jar:file:{../artifact[@name=$name][@type='doc']/cache-location}!/"/>
             </attributes>
           </xsl:if>
-          
+
           <!-- Warn about JUnit imports -->
           <xsl:if test="(../@name='junit') and (../@organisation='org.junit')">
         		<accessrules>

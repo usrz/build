@@ -40,7 +40,7 @@
   <target name="resolve"
           unless="task.executed.resolve">
     <property name="task.executed.resolve" value="true"/>
-          
+
     <!-- Resolve Ivy's descriptor fully -->
     <ivy:resolve />
     <ivy:cachepath pathid="classpath.main"
@@ -54,15 +54,15 @@
     <tstamp>
       <format property="ivy.timestamp" pattern="yyyyMMddHHmmss"/>
     </tstamp>
-    
+
     <!-- Set our publish revision -->
     <condition property="ivy.revision.publish" value="${ivy.revision}">
       <equals arg1="${ivy.status}" arg2="release"/>
     </condition>
     <property name="ivy.revision.publish" value="${ivy.revision}-${ivy.timestamp}"/>
-    
+
   </target>
-  
+
   <!-- Prepare Eclipse's .classpath file -->
   <target name="eclipse"
           depends="resolve"
@@ -77,7 +77,7 @@
           in="${targetdir}/artifacts.xml"
           out="${basedir}/.classpath" />
   </target>
-    
+
 
 </project>
 

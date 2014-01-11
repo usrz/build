@@ -21,8 +21,8 @@
           depends="compile"
           description="Run TestNG tests"
           unless="task.executed.test">
-    <property name="task.executed.test" value="true"/>     
-    
+    <property name="task.executed.test" value="true"/>
+
     <!-- Cache the path for TestNG (latest) to define our task -->
     <ivy:cachepath organisation="org.testng"
                    module="testng"
@@ -43,7 +43,7 @@
        <path refid="classpath.test"/>
        <pathelement path="${targetdir}/main"/>
        <pathelement path="${targetdir}/test"/>
-    </path>                   
+    </path>
 
     <!-- Run tests -->
     <testng classpathref="classpath.test.execute"

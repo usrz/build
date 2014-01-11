@@ -16,7 +16,7 @@
     +=======================================================================+-->
 
 <project xmlns:ivy="antlib:org.apache.ivy.ant">
-  
+
   <!-- Basic directory properties -->
   <property name="builddir" value="${basedir}/build" />
   <property name="sourcedir" value="${basedir}/source" />
