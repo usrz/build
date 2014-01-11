@@ -84,13 +84,13 @@ EOF
 
 # Create our source directories
 echo -e '\033[34mCreating source directories...\033[0m'
-mkdir -p "source" "source/main" "source/test"
+mkdir -p "source/main/${ORGANISATION//.//}/${MODULE//.//}"
+mkdir -p "source/test/${ORGANISATION//.//}/${MODULE//.//}"
 
 # Initializing GIT
 echo -e '\033[34mInitialising GIT repository...\033[0m'
 git add -f build.xml ivy.xml .gitignore
-git commit -a -m "Initial commit for revision ${REVISION}"
-git tag -m "Initial tag for revision ${REVISION}" "${REVISION}"
+git commit -a -m "Initial commit"
 
 # All done
 echo -e "\033[34mProject \"\033[33m${ORGANISATION}.${MODULE}-${REVISION}\033[34m\" initialised!\033[0m"
