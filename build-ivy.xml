@@ -26,6 +26,9 @@
            uri="antlib:org.apache.ivy.ant"
            classpath="${builddir}/ivy-2.3.0.jar" />
 
+  <!-- Set our "ivy.publish" property (if not set before) -->
+  <property name="ivy.publications" value="${targetdir}/publications"/>
+
   <!-- Initialize Ivy -->
   <ivy:configure file="${builddir}/ivy-settings.xml" />
 
@@ -57,7 +60,7 @@
       <equals arg1="${ivy.status}" arg2="release"/>
     </condition>
     <property name="ivy.revision.publish" value="${ivy.revision}-${ivy.timestamp}"/>
-
+    
   </target>
   
   <!-- Prepare Eclipse's .classpath file -->
