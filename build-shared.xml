@@ -23,11 +23,11 @@
   <property name="targetdir" value="${basedir}/target" />
 
   <!-- Import build files for specific tasks -->
-  <import file="build-ivy.xml" />
   <import file="build-compile.xml" />
   <import file="build-javadoc.xml" />
-  <import file="build-test.xml" />
-  <import file="build-dist.xml" />
+  <import file="build-publish.xml" />
+  <import file="build-resolve.xml" />
+  <import file="build-testing.xml" />
 
   <!-- Cleanup tasks -->
   <target name="clean"

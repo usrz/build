@@ -17,40 +17,35 @@
 
 <project xmlns:ivy="antlib:org.apache.ivy.ant">
 
-  <!-- Resolve and prepare the distribution directory -->
-  <target name="dist.prepare"
-          depends="resolve"
-          unless="task.executed.dist.prepare">
-    <property name="task.executed.dist.prepare" value="true"/>
-    <mkdir dir="${targetdir}/dist"/>
-  </target>
+  <!--+====================================================================+
+      | PREPARE ARCHIVES FOR A FULL DISTRIBUTION                           |
+      +=================================================================== + -->
 
   <!-- Archive sources -->
-  <target name="dist.sources"
-          depends="dist.prepare"
-          unless="task.executed.dist.sources">
-    <property name="task.executed.dist.sources" value="true"/>
-    <zip destfile="${targetdir}/dist/${ivy.module}-src.zip"
+  <target name="publish.archive.sources"
+          unless="task.executed.publish.archive.sources">
+    <property name="task.executed.publish.archive.sources" value="true"/>
+    <zip destfile="${targetdir}/archives/${ivy.module}-src.zip"
          basedir="${sourcedir}/main"
          filesonly="true" />
   </target>
 
   <!-- Archive javadocs -->
-  <target name="dist.javadoc"
-          depends="dist.prepare,javadoc"
-          unless="task.executed.dist.javadoc">
-    <property name="task.executed.dist.javadoc" value="true"/>
-    <zip destfile="${targetdir}/dist/${ivy.module}-doc.zip"
+  <target name="publish.archive.javadoc"
+          depends="javadoc"
+          unless="task.executed.publish.archive.javadoc">
+    <property name="task.executed.publish.archive.javadoc" value="true"/>
+    <zip destfile="${targetdir}/archives/${ivy.module}-doc.zip"
          basedir="${targetdir}/docs"
          filesonly="true" />
   </target>
 
   <!-- Archive classes -->
-  <target name="dist.classes"
-          depends="dist.prepare,compile"
-          unless="task.executed.dist.classes">
-    <property name="task.executed.dist.classes" value="true"/>
-    <jar destfile="${targetdir}/dist/${ivy.module}-bin.jar"
+  <target name="publish.archive.classes"
+          depends="compile"
+          unless="task.executed.publish.archive.classes">
+    <property name="task.executed.publish.archive.classes" value="true"/>
+    <jar destfile="${targetdir}/archives/${ivy.module}-bin.jar"
          basedir="${targetdir}/main"
          filesonly="true">
       <manifest>
@@ -61,24 +56,30 @@
     </jar>
   </target>
 
+  <!-- Archive everything -->
+  <target name="publish.archive"
+          depends="publish.archive.sources,publish.archive.classes,publish.archive.javadoc"
+          unless="task.executed.publish.archive">
+    <property name="task.executed.publish.archive" value="true"/>
+  </target>
+    
   <!--+====================================================================+
-      | PREPARE ARCHIVES FOR A FULL DISTRIBUTION                           |
+      | DELIVER AND PUBLISH IVY MODULE                                     |
       +=================================================================== + -->
-  <target name="dist"
-          depends="dist.sources,dist.javadoc,dist.classes"
-          description="Prepare archives for distribution"
-          unless="task.executed.dist">
-    <property name="task.executed.dist" value="true"/>
+
+  <target name="publish"
+          depends="test,publish.archive"
+          description="Publish the Ivy module artifacts"
+          unless="task.executed.publish">
+    <property name="task.executed.publish" value="true"/>
 
     <ivy:publish resolver="publications"
                  forcedeliver="true"
                  pubrevision="${ivy.revision.publish}"
                  pubdate="${ivy.timestamp}"
                  conf="*(public)">
-       <artifacts pattern="${targetdir}/dist/[artifact]-[type].[ext]" />
+       <artifacts pattern="${targetdir}/archives/[artifact]-[type].[ext]" />
     </ivy:publish>
-
-    <echoproperties/>
   </target>
 
 </project>
