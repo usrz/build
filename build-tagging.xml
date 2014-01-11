@@ -112,7 +112,7 @@
       <arg value="-a"/>
       <arg value="-m"/>
       <arg value="Release ${ivy.revision.new}"/>
-      <arg value="releases/${ivy.revision.new}"/>
+      <arg value="${ivy.revision.new}"/>
     </exec>
 
     <!-- Push changes and tags -->
