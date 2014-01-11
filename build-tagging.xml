@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--+=======================================================================+
+    | Copyright 2014 USRZ.com and Pier Paolo Fumagalli                      |
+    +- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+    | Licensed under the Apache License, Version 2.0 (the "License");       |
+    | you may not use this file except in compliance with the License.      |
+    | You may obtain a copy of the License at                               |
+    |                                                                       |
+    |  http://www.apache.org/licenses/LICENSE-2.0                           |
+    |                                                                       |
+    | Unless required by applicable law or agreed to in writing, software   |
+    | distributed under the License is distributed on an "AS IS" BASIS,     |
+    | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or       |
+    | implied. See the License for the specific language governing          |
+    | permissions and limitations under the License.                        |
+    +=======================================================================+-->
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <!--+====================================================================+
+      | PARSE AND INCREASE REVISION NUMBERS                                |
+      +=================================================================== + -->
+  
+  <!-- Parse revision number -->
+  <target name="tag.parse"
+          depends="resolve"
+          unless="task.executed.tag.parse">
+    <property name="task.executed.tag:parse" value="true"/>
+    <script language="javascript">
+      <![CDATA[
+        // Parse our "ivy.revision" property
+        var revision = String(project.getProperty('ivy.revision'));
+        var match = /^(\d+)\.(\d+)\.(\d+)$/gi.exec(revision);
+        if (match == null) throw 'Invalid revision in Ivy file: "' + revision + '"';
+        project.setProperty('ivy.revision.major', match[1]);
+        project.setProperty('ivy.revision.minor', match[2]);
+        project.setProperty('ivy.revision.build', match[3]);
+      ]]>
+    </script>
+  </target>
+
+  <!-- Increase major revision number -->
+  <target name="tag.increase.major"
+          depends="tag.parse"
+          unless="task.executed.tag.increase.major">
+    <property name="task.executed.tag:increase.major" value="true"/>
+    <script language="javascript">
+      <![CDATA[
+        var major = project.getProperty('ivy.revision.major');
+        project.setProperty('ivy.revision.new', (parseInt(major) + 1) + '.0.0');
+      ]]>
+    </script>
+  </target>
+
+  <!-- Increase minor revision number -->
+  <target name="tag.increase.minor"
+          depends="tag.parse"
+          unless="task.executed.tag.increase.minor">
+    <property name="task.executed.tag:increase.minor" value="true"/>
+    <script language="javascript">
+      <![CDATA[
+        var major = project.getProperty('ivy.revision.major');
+        var minor = project.getProperty('ivy.revision.minor');
+        project.setProperty('ivy.revision.new', major + '.' + (parseInt(minor) + 1) + '.0');
+      ]]>
+    </script>
+  </target>
+
+  <!-- Increase build revision number -->
+  <target name="tag.increase.build"
+          depends="tag.parse"
+          unless="task.executed.tag.increase.build">
+    <property name="task.executed.tag:increase.build" value="true"/>
+    <script language="javascript">
+      <![CDATA[
+        var major = project.getProperty('ivy.revision.major');
+        var minor = project.getProperty('ivy.revision.minor');
+        var build = project.getProperty('ivy.revision.build');
+        project.setProperty('ivy.revision.new', major + '.' + minor + '.' + (parseInt(build) + 1));
+      ]]>
+    </script>
+  </target>
+
+  <!--+====================================================================+
+      | TAG A RELEASE                                                      |
+      +=================================================================== + -->
+
+  <target name="tag.execute"
+          unless="task.executed.tag.execute">
+    <property name="task.executed.tag.execute" value="true"/>
+
+    <!-- Alter ivy.xml to include the new revision number -->
+    <xslt style="${builddir}/ivy-revision.xslt"
+          in="${basedir}/ivy.xml"
+          out="${targetdir}/ivy.newrevision.xml">
+      <param name="revision" expression="${ivy.revision.new}"/>
+    </xslt>
+    <move file="${targetdir}/ivy.newrevision.xml"
+          tofile="${basedir}/ivy.xml"/>
+
+    <!-- Commit changes to ivy.xml -->
+    <exec executable="git">
+      <arg value="commit"/>
+      <arg value="-m"/>
+      <arg value="Bumping revision to ${ivy.revision.new}"/>
+      <arg value="ivy.xml"/>
+    </exec>
+
+    <!-- Tag the new revision -->
+    <exec executable="git">
+      <arg value="tag"/>
+      <arg value="-a"/>
+      <arg value="-m"/>
+      <arg value="Release ${ivy.revision.new}"/>
+      <arg value="releases/${ivy.revision.new}"/>
+    </exec>
+
+    <!-- Push changes and tags -->
+    <exec executable="git">
+      <arg value="push"/>
+    </exec>
+    <exec executable="git">
+      <arg value="push"/>
+      <arg value="--tags"/>
+    </exec>
+
+    <!-- All done! -->
+    <echo message="New revision ${ivy.revision.new} tagged"/>
+  </target>
+    
+  <!--+====================================================================+
+      | PUBLIC TAGGING TASKS                                               |
+      +=================================================================== + -->
+
+  <target name="tag:major"
+          depends="tag.increase.major,tag.execute"
+          unless="task.executed.tag:major"
+          description="Tag the current code by increasing the major version">
+    <property name="task.executed.tag:major" value="true"/>
+  </target>
+
+  <target name="tag:minor"
+          depends="tag.increase.minor,tag.execute"
+          unless="task.executed.tag:minor"
+          description="Tag the current code by increasing the minor version">
+    <property name="task.executed.tag" value="true"/>
+  </target>
+
+  <target name="tag:build"
+          depends="tag.increase.build,tag.execute"
+          unless="task.executed.tag:build"
+          description="Tag the current code by increasing the build version">
+    <property name="task.executed.tag:build" value="true"/>
+  </target>
+
+</project>

@@ -15,27 +15,36 @@
     | permissions and limitations under the License.                        |
     +=======================================================================+-->
 
-<project xmlns:ivy="antlib:org.apache.ivy.ant">
+<xsl:stylesheet version="1.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <!-- Basic directory properties -->
-  <property name="builddir" value="${basedir}/build" />
-  <property name="sourcedir" value="${basedir}/source" />
-  <property name="targetdir" value="${basedir}/target" />
+  <!-- Make sure we encode this nicely -->
+  <xsl:output method="xml"
+              encoding="UTF-8"
+              omit-xml-declaration="no"
+              indent="yes"/>
 
-  <!-- Import build files for specific tasks -->
-  <import file="build-compile.xml" />
-  <import file="build-javadoc.xml" />
-  <import file="build-publish.xml" />
-  <import file="build-resolve.xml" />
-  <import file="build-tagging.xml" />
-  <import file="build-testing.xml" />
+  <!-- The variable for our new revision -->
+  <xsl:param name="revision"/>
 
-  <!-- Cleanup tasks -->
-  <target name="clean"
-          description="Cleanup all targets"
-          unless="task.executed.clean">
-    <property name="task.executed.clean" value="true"/>
-    <delete dir="${targetdir}" />
-  </target>
+  <!-- Separate XML declaration from root node -->
+  <xsl:template match="/">
+    <xsl:text>&#10;</xsl:text>
+    <xsl:apply-templates select="ivy-module"/>
+  </xsl:template>
 
-</project>
+  <!-- Copy everything -->
+  <xsl:template match="@*|node()">
+      <xsl:copy>
+          <xsl:apply-templates select="@*|node()"/>
+      </xsl:copy>
+  </xsl:template>
+
+  <!-- Update revision attribute -->
+  <xsl:template match="/ivy-module/info/@revision">
+    <xsl:attribute name="revision">
+      <xsl:value-of select="$revision"/>
+    </xsl:attribute>
+  </xsl:template>
+
+</xsl:stylesheet>
