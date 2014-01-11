@@ -72,6 +72,14 @@
               <attribute name="javadoc_location" value="jar:file:{../artifact[@name=$name][@type='doc']/cache-location}!/"/>
             </attributes>
           </xsl:if>
+          
+          <!-- Warn about JUnit imports -->
+          <xsl:if test="(../@name='junit') and (../@organisation='org.junit')">
+        		<accessrules>
+        			<accessrule kind="discouraged" pattern="junit/**"/>
+        			<accessrule kind="discouraged" pattern="org/junit/**"/>
+        		</accessrules>
+          </xsl:if>
 
         </classpathentry>
       </xsl:if>
