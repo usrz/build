@@ -53,13 +53,11 @@ cat <<EOF > ivy.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
 
-  <info organisation="${ORGANISATION}" module="${MODULE}" revision="${REVISION}">
-    <description>${DESCRIPTION}</description>
-  </info>
+  <info organisation="${ORGANISATION}" module="${MODULE}" revision="${REVISION}"/>
 
   <configurations>
-    <conf name="default" visibility="public" />
-    <conf name="test"    visibility="private" extends="default" />
+    <conf name="default" visibility="public"/>
+    <conf name="test" visibility="private" extends="default"/>
   </configurations>
 
   <publications>
@@ -69,7 +67,7 @@ cat <<EOF > ivy.xml
   </publications>
 
   <dependencies>
-    <dependency org="org.testng" name="testng" rev="latest.release" conf="test->default"/>
+    <dependency org="org.testng" name="testng" rev="latest.release" conf="test-&gt;default"/>
   </dependencies>
 
 </ivy-module>
