@@ -115,13 +115,12 @@
       <arg value="${ivy.revision.new}"/>
     </exec>
 
-    <!-- Push changes and tags -->
+    <!-- Push changes and tags (git push --all + git push --tags) -->
     <exec executable="git">
       <arg value="push"/>
-    </exec>
-    <exec executable="git">
-      <arg value="push"/>
-      <arg value="--tags"/>
+      <arg value="origin"/>
+      <arg value="refs/heads/*"/>
+      <arg value="refs/tags/*"/>
     </exec>
 
     <!-- All done! -->
