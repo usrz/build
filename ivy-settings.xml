@@ -14,7 +14,6 @@
     | implied. See the License for the specific language governing          |
     | permissions and limitations under the License.                        |
     +=======================================================================+-->
-
 <ivysettings>
 
   <!-- Where to put library files once we retrieve them -->
@@ -25,23 +24,38 @@
   <property name="ivy.publish.src.artifacts.pattern"
             value="${targetdir}/publish/[artifact]-[revision]-[type].[ext]"/>
 
-  <settings defaultResolver="libraries"/>
-
+  <!-- Definition of how our cache is organized -->
   <caches defaultCacheDir="${basedir}/.ivycache"
           ivyPattern="[organisation]/[module]/[revision]/ivy.xml"
           artifactPattern="[organisation]/[module]/[revision]/[organisation].[artifact]-[revision]-[type].[ext]" />
 
-  <resolvers>
+  <!-- The default resolver to use (see also <modules/> below) -->
+  <settings defaultResolver="libraries"/>
 
+  <!-- Our list of resolvers -->
+  <resolvers>
+    <!-- External libraries -->
     <url name="libraries" checkmodified="true">
       <ivy      pattern="http://dev.usrz.com/libraries/[organisation]/[module]/[revision]/ivy.xml" />
       <artifact pattern="http://dev.usrz.com/libraries/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
     </url>
 
+    <!-- Our releases, published by Jenkins -->
+    <url name="releases" checkmodified="true">
+      <ivy      pattern="http://dev.usrz.com/releases/[organisation]/[module]/[revision]/ivy.xml" />
+      <artifact pattern="http://dev.usrz.com/releases/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
+    </url>
+
+    <!-- Where/how Jenkins publishes -->
     <filesystem name="publications" checksums="">
       <ivy      pattern="${ivy.publications}/[organisation]/[module]/[revision]/ivy.xml" />
       <artifact pattern="${ivy.publications}/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
     </filesystem>
-
   </resolvers>
+
+  <!-- Specific resolvers to use for specific patterns -->
+  <modules>
+    <module organisation="org.usrz.*" name="*" resolver="releases"/>
+  </modules>
+
 </ivysettings>
