@@ -38,15 +38,15 @@
     <taskdef resource="testngtasks" classpathref="classpath.testng"/>
 
     <!-- Create a class path for running tests -->
-    <path id="classpath.test.execute">
-       <path refid="classpath.main"/>
-       <path refid="classpath.test"/>
+    <path id="classpath.testing.execute">
+       <path refid="classpath.compile"/>
+       <path refid="classpath.testing"/>
        <pathelement path="${targetdir}/main"/>
        <pathelement path="${targetdir}/test"/>
     </path>
 
     <!-- Run tests -->
-    <testng classpathref="classpath.test.execute"
+    <testng classpathref="classpath.testing.execute"
             outputDir="${targetdir}/testng"
             excludedgroups="local"
             haltOnFailure="true"

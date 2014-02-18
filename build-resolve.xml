@@ -43,10 +43,10 @@
 
     <!-- Resolve Ivy's descriptor fully -->
     <ivy:resolve />
-    <ivy:cachepath pathid="classpath.main"
+    <ivy:cachepath pathid="classpath.compile"
                    conf="compile"
                    type="bin" />
-    <ivy:cachepath pathid="classpath.test"
+    <ivy:cachepath pathid="classpath.testing"
                    conf="testing"
                    type="bin" />
 
