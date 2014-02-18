@@ -57,7 +57,8 @@ cat <<EOF > ivy.xml
 
   <configurations>
     <conf name="default" visibility="public"/>
-    <conf name="test" visibility="private" extends="default"/>
+    <conf name="compile" visibility="private" extends="default"/>
+    <conf name="testing" visibility="private" extends="compile"/>
   </configurations>
 
   <publications>

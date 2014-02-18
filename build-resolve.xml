@@ -44,10 +44,10 @@
     <!-- Resolve Ivy's descriptor fully -->
     <ivy:resolve />
     <ivy:cachepath pathid="classpath.main"
-                   conf="default"
+                   conf="compile"
                    type="bin" />
     <ivy:cachepath pathid="classpath.test"
-                   conf="test"
+                   conf="testing"
                    type="bin" />
 
     <!-- Calculate a timestamp for publishing -->
@@ -72,7 +72,7 @@
 
     <mkdir dir="${targetdir}" />
     <ivy:artifactreport tofile="${targetdir}/artifacts.xml"
-                        log="downloadonly"/>
+                        log="download-only"/>
     <xslt style="${builddir}/ivy-eclipse.xslt"
           in="${targetdir}/artifacts.xml"
           out="${basedir}/.classpath" />
