@@ -68,7 +68,7 @@ cat <<EOF > ivy.xml
   </publications>
 
   <dependencies>
-    <dependency org="org.testng" name="testng" rev="latest.release" conf="test-&gt;default"/>
+    <dependency org="org.testng" name="testng" rev="latest.release" conf="testing-&gt;default"/>
   </dependencies>
 
 </ivy-module>
