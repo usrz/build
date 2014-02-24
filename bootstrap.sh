@@ -86,9 +86,27 @@ echo -e '\033[34mCreating source directories...\033[0m'
 mkdir -p "source/main/${ORGANISATION//.//}/${MODULE//.//}"
 mkdir -p "source/test/${ORGANISATION//.//}/${MODULE//.//}"
 
+# Add a LogBack configuration for testing
+echo -e '\033[34mCreating "\033[33msource/test/logback-test.xml\033[34m"...\033[0m'
+cat <<EOF > source/test/logback-test.xml
+<?xml version="1.0" encoding="UTF8"?>
+<configuration debug="false"> 
+  <appender name="stderr" class="ch.qos.logback.core.ConsoleAppender">
+    <target>System.err</target>
+    <encoder>
+      <pattern>%date{HH:mm:ss.SSS} [%-5level] %logger: %msg%n</pattern>
+    </encoder>
+  </appender>
+  <logger name="${ORGANISATION}.${MODULE}" level="debug" />
+  <root level="info">
+    <appender-ref ref="stderr" />
+  </root>
+</configuration>
+EOF
+
 # Initializing GIT
 echo -e '\033[34mInitialising GIT repository...\033[0m'
-git add -f build.xml ivy.xml .gitignore
+git add -f build.xml ivy.xml .gitignore source/test/logback-test.xml
 git commit -a -m "Initial commit"
 
 # All done
