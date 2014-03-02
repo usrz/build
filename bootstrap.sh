@@ -90,17 +90,22 @@ mkdir -p "source/test/${ORGANISATION//.//}/${MODULE//.//}"
 echo -e '\033[34mCreating "\033[33msource/test/logback-test.xml\033[34m"...\033[0m'
 cat <<EOF > source/test/logback-test.xml
 <?xml version="1.0" encoding="UTF8"?>
+
 <configuration debug="false"> 
+
   <appender name="stderr" class="ch.qos.logback.core.ConsoleAppender">
     <target>System.err</target>
     <encoder>
       <pattern>%date{HH:mm:ss.SSS} [%-5level] %logger: %msg%n</pattern>
     </encoder>
   </appender>
+
   <logger name="${ORGANISATION}.${MODULE}" level="debug" />
+
   <root level="info">
     <appender-ref ref="stderr" />
   </root>
+
 </configuration>
 EOF
 
