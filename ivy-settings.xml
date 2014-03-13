@@ -25,7 +25,7 @@
             value="${targetdir}/publish/[artifact]-[revision]-[type].[ext]"/>
 
   <!-- Definition of how our cache is organized -->
-  <caches defaultCacheDir="${basedir}/.ivycache"
+  <caches defaultCacheDir="${user.home}/.ivycache-usrz"
           ivyPattern="[organisation]/[module]/[revision]/ivy.xml"
           artifactPattern="[organisation]/[module]/[revision]/[organisation].[artifact]-[revision]-[type].[ext]" />
 
