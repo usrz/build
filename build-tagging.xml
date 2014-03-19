@@ -99,6 +99,7 @@
           tofile="${basedir}/ivy.xml"/>
 
     <!-- Commit changes to ivy.xml -->
+    <echo message="Applying changes to &quot;ivy.xml&quot;"/>
     <exec executable="git">
       <arg value="commit"/>
       <arg value="-m"/>
@@ -106,10 +107,14 @@
       <arg value="ivy.xml"/>
     </exec>
 
-    <!-- Checkout the "release" branch -->
+    <!-- Checkout the "release" branch and pull it -->
+    <echo message="Merging &quot;release&quot; branch"/>
     <exec executable="git">
       <arg value="checkout"/>
       <arg value="release"/>
+    </exec>
+    <exec executable="git">
+      <arg value="pull"/>
     </exec>
 
     <!-- Merge "master" branch into "release" -->
@@ -119,6 +124,7 @@
     </exec>
 
     <!-- Tag the new revision -->
+    <echo message="Tagging &quot;${ivy.revision.new}&quot; revision"/>
     <exec executable="git">
       <arg value="tag"/>
       <arg value="-a"/>
@@ -134,6 +140,7 @@
     </exec>
 
     <!-- Push changes and tags (git push -all + git push -tags) -->
+    <echo message="Pushing changes back to origin"/>
     <exec executable="git">
       <arg value="push"/>
       <arg value="origin"/>
