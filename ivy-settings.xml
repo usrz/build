@@ -44,8 +44,8 @@
 
     <!-- Where/how Jenkins publishes -->
     <filesystem name="publications" checksums="">
-      <ivy      pattern="${ivy.publications}/[organisation]/[module]/[revision]/ivy.xml" />
-      <artifact pattern="${ivy.publications}/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
+      <ivy      pattern="${ivy.publications}/${ivy.dirPattern}/ivy.xml" />
+      <artifact pattern="${ivy.publications}/${ivy.dirPattern}/[artifact]-[revision]-[type].[ext]" />
     </filesystem>
   </resolvers>
 

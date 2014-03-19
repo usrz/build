@@ -28,6 +28,7 @@
 
   <!-- Set our "ivy.publish" property (if not set before) -->
   <property name="ivy.publications" value="${targetdir}/publications"/>
+  <property name="ivy.dirPattern" value="[organisation]/[module]/[revision]"/>
 
   <!-- Allow use of cache only (helps in two steps build) -->
   <property name="ivy.useCacheOnly" value="false"/>
