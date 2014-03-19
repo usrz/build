@@ -109,10 +109,36 @@ cat <<EOF > source/test/logback-test.xml
 </configuration>
 EOF
 
+# Create our CircleCI YML config
+cat <<EOF > circle.yml
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init
+dependencies:
+  override:
+    - ant resolve -Divy.useCacheOnly=false
+  cache_directories:
+    - ~/.ivycache-usrz
+test:
+  override:
+    - ant test -Divy.useCacheOnly=true
+deployment:
+  release:
+    branch: release
+    commands:
+      - ant publish
+          -Dtask.executed.test=true
+          -Divy.useCacheOnly=true
+          -Divy.status=release
+      - (cd target/publications && scp -r . circleci@dev.usrz.com:releases)
+EOF
+
 # Initializing GIT
 echo -e '\033[34mInitialising GIT repository...\033[0m'
 git add -f build.xml ivy.xml .gitignore source/test/logback-test.xml
 git commit -a -m "Initial commit"
+git branch release
 
 # All done
 echo -e "\033[34mProject \"\033[33m${ORGANISATION}.${MODULE}-${REVISION}\033[34m\" initialised!\033[0m"
