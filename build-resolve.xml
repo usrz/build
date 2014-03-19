@@ -29,6 +29,9 @@
   <!-- Set our "ivy.publish" property (if not set before) -->
   <property name="ivy.publications" value="${targetdir}/publications"/>
 
+  <!-- Allow use of cache only (helps in two steps build) -->
+  <property name="ivy.useCacheOnly" value="false"/>
+
   <!-- Initialize Ivy -->
   <ivy:configure file="${builddir}/ivy-settings.xml" />
 
@@ -42,7 +45,7 @@
     <property name="task.executed.resolve" value="true"/>
 
     <!-- Resolve Ivy's descriptor fully -->
-    <ivy:resolve />
+    <ivy:resolve useCacheOnly="${ivy.useCacheOnly}"/>
     <ivy:cachepath pathid="classpath.compile"
                    conf="compile"
                    type="bin" />
