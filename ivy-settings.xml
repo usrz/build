@@ -20,10 +20,6 @@
   <property name="ivy.retrieve.pattern"
             value="${basedir}/lib/[organisation].[artifact]-[revision]-[type].[ext]"/>
 
-  <!-- Where the build system places JARs upon building -->
-  <property name="ivy.publish.src.artifacts.pattern"
-            value="${targetdir}/publish/[artifact]-[revision]-[type].[ext]"/>
-
   <!-- Definition of how our cache is organized -->
   <caches defaultCacheDir="${user.home}/.ivycache-usrz"
           ivyPattern="[organisation]/[module]/[revision]/ivy.xml"
