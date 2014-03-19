@@ -106,6 +106,18 @@
       <arg value="ivy.xml"/>
     </exec>
 
+    <!-- Checkout the "release" branch -->
+    <exec executable="git">
+      <arg value="checkout"/>
+      <arg value="release"/>
+    </exec>
+
+    <!-- Merge "master" branch into "release" -->
+    <exec executable="git">
+      <arg value="merge"/>
+      <arg value="master"/>
+    </exec>
+
     <!-- Tag the new revision -->
     <exec executable="git">
       <arg value="tag"/>
@@ -113,6 +125,12 @@
       <arg value="-m"/>
       <arg value="Release ${ivy.revision.new}"/>
       <arg value="${ivy.revision.new}"/>
+    </exec>
+
+    <!-- Go back to the "master" branch -->
+    <exec executable="git">
+      <arg value="checkout"/>
+      <arg value="master"/>
     </exec>
 
     <!-- Push changes and tags (git push -all + git push -tags) -->
