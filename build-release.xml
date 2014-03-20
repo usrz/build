@@ -59,13 +59,12 @@
       <arg value="master"/>
     </exec>
 
-    <!-- Push changes and tags (git push -all + git push -tags) -->
+    <!-- Push changes to all branches -->
     <echo message="Pushing changes back to origin"/>
-    <exec executable="git">
+    <exec failonerror="true" executable="git">
       <arg value="push"/>
       <arg value="origin"/>
-      <arg value="refs/heads/*"/>
-      <arg value="refs/tags/*"/>
+      <arg value="--all"/>
     </exec>
 
   </target>
