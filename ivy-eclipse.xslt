@@ -73,12 +73,19 @@
             </attributes>
           </xsl:if>
 
-          <!-- Warn about JUnit imports -->
+          <!-- Warn about JUnit/Guice imports -->
           <xsl:if test="(../@name='junit') and (../@organisation='org.junit')">
         		<accessrules>
         			<accessrule kind="discouraged" pattern="junit/**"/>
         			<accessrule kind="discouraged" pattern="org/junit/**"/>
         		</accessrules>
+          </xsl:if>
+          <xsl:if test="(../@name='guice') and (../@organisation='com.google')">
+            <accessrules>
+              <accessrule kind="discouraged" pattern="com/google/inject/Inject"/>
+              <accessrule kind="discouraged" pattern="com/google/inject/Singleton"/>
+              <accessrule kind="discouraged" pattern="com/google/inject/name/Named"/>
+            </accessrules>
           </xsl:if>
 
         </classpathentry>
