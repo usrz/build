@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--+=======================================================================+
+    | Copyright 2014 USRZ.com and Pier Paolo Fumagalli                      |
+    +- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+    | Licensed under the Apache License, Version 2.0 (the "License");       |
+    | you may not use this file except in compliance with the License.      |
+    | You may obtain a copy of the License at                               |
+    |                                                                       |
+    |  http://www.apache.org/licenses/LICENSE-2.0                           |
+    |                                                                       |
+    | Unless required by applicable law or agreed to in writing, software   |
+    | distributed under the License is distributed on an "AS IS" BASIS,     |
+    | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or       |
+    | implied. See the License for the specific language governing          |
+    | permissions and limitations under the License.                        |
+    +=======================================================================+-->
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <target name="release"
+          unless="task.executed.release"
+          description="Merge the &quot;master&quot; branch into &quot;release&quot;">
+    <property name="task.executed.release" value="true"/>
+
+    <!-- Check for local modifications -->
+    <echo message="Checking for local modifications"/>
+    <exec executable="git" resultproperty="git.check.1">
+      <arg value="diff"/> 
+      <arg value="--cached"/>
+      <arg value="--quiet"/>
+    </exec>
+    <exec executable="git" resultproperty="git.check.2">
+      <arg value="diff"/>
+      <arg value="--quiet"/>
+    </exec>
+    <condition property="git.check.ok">
+      <and>
+        <equals arg1="${git.check.1}" arg2="0"/>
+        <equals arg1="${git.check.2}" arg2="0"/>
+      </and>
+    </condition>
+    <fail unless="git.check.ok" message="Local modifications detected"/>
+
+    <!-- Check out, update and merge "release" branch -->
+    <echo message="Updating and merging &quot;release&quot; branch"/>
+    <exec failonerror="true" executable="git">
+      <arg value="checkout"/>
+      <arg value="release"/>
+    </exec>
+    <exec failonerror="true" executable="git">
+      <arg value="pull"/>
+    </exec>
+    <exec failonerror="true" executable="git">
+      <arg value="merge"/>
+      <arg value="master"/>
+    </exec>
+    <exec failonerror="true" executable="git">
+      <arg value="checkout"/>
+      <arg value="master"/>
+    </exec>
+
+    <!-- Push changes and tags (git push -all + git push -tags) -->
+    <echo message="Pushing changes back to origin"/>
+    <exec executable="git">
+      <arg value="push"/>
+      <arg value="origin"/>
+      <arg value="refs/heads/*"/>
+      <arg value="refs/tags/*"/>
+    </exec>
+
+  </target>
+</project>

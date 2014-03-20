@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--+=======================================================================+
+    | Copyright 2014 USRZ.com and Pier Paolo Fumagalli                      |
+    +- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+    | Licensed under the Apache License, Version 2.0 (the "License");       |
+    | you may not use this file except in compliance with the License.      |
+    | You may obtain a copy of the License at                               |
+    |                                                                       |
+    |  http://www.apache.org/licenses/LICENSE-2.0                           |
+    |                                                                       |
+    | Unless required by applicable law or agreed to in writing, software   |
+    | distributed under the License is distributed on an "AS IS" BASIS,     |
+    | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or       |
+    | implied. See the License for the specific language governing          |
+    | permissions and limitations under the License.                        |
+    +=======================================================================+-->
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <!--+====================================================================+
+      | PARSE AND INCREASE REVISION NUMBERS                                |
+      +=================================================================== + -->
+  
+  <!-- Parse revision number -->
+  <target name="revision.parse"
+          depends="resolve"
+          unless="task.executed.revision.parse">
+    <property name="task.executed.revision.parse" value="true"/>
+    <script language="javascript">
+      <![CDATA[
+        // Parse our "ivy.revision" property
+        var revision = String(project.getProperty('ivy.revision'));
+        var match = /^(\d+)\.(\d+)$/gi.exec(revision);
+        if (match == null) throw 'Invalid revision in Ivy file: "' + revision + '"';
+        project.setProperty('ivy.revision.major', match[1]);
+        project.setProperty('ivy.revision.minor', match[2]);
+      ]]>
+    </script>
+  </target>
+
+  <!-- Increase major revision number -->
+  <target name="revision.increase.major"
+          depends="revision.parse"
+          unless="task.executed.revision.increase.major">
+    <property name="task.executed.revision.increase.major" value="true"/>
+    <script language="javascript">
+      <![CDATA[
+        var major = project.getProperty('ivy.revision.major');
+        project.setProperty('ivy.revision.new', (parseInt(major) + 1) + '.0');
+      ]]>
+    </script>
+  </target>
+
+  <!-- Increase minor revision number -->
+  <target name="revision.increase.minor"
+          depends="revision.parse"
+          unless="task.executed.revision.increase.minor">
+    <property name="task.executed.revision.increase.minor" value="true"/>
+    <script language="javascript">
+      <![CDATA[
+        var major = project.getProperty('ivy.revision.major');
+        var minor = project.getProperty('ivy.revision.minor');
+        project.setProperty('ivy.revision.new', major + '.' + (parseInt(minor) + 1));
+      ]]>
+    </script>
+  </target>
+
+  <!--+====================================================================+
+      | SAVE THE NEW REVISION NUMBER                                       |
+      +=================================================================== + -->
+
+  <target name="revision.save"
+          unless="task.executed.revision.save">
+    <property name="task.executed.revision.save" value="true"/>
+
+    <!-- Alter ivy.xml to include the new revision number -->
+    <xslt style="${builddir}/ivy-revision.xslt"
+          in="${basedir}/ivy.xml"
+          out="${targetdir}/ivy.newrevision.xml">
+      <param name="revision" expression="${ivy.revision.new}"/>
+    </xslt>
+    <move file="${targetdir}/ivy.newrevision.xml"
+          tofile="${basedir}/ivy.xml"/>
+
+    <!-- Commit changes to ivy.xml -->
+    <echo message="Applying changes to &quot;ivy.xml&quot;"/>
+    <exec executable="git">
+      <arg value="commit"/>
+      <arg value="-m"/>
+      <arg value="Bumping revision to ${ivy.revision.new}"/>
+      <arg value="ivy.xml"/>
+    </exec>
+
+    <!-- All done! -->
+    <echo message="New revision ${ivy.revision.new} committed"/>
+  </target>
+    
+  <!--+====================================================================+
+      | PUBLIC REVISION BUMPING TASKS                                      |
+      +=================================================================== + -->
+
+  <target name="revbump:major"
+          depends="revision.increase.major,revision.save"
+          unless="task.executed.revbump">
+    <property name="task.executed.revbump" value="true"/>
+  </target>
+
+  <target name="revbump"
+          depends="revision.increase.minor,revision.save"
+          unless="task.executed.revbump"
+          description="Bump the minor version (or &quot;revbump:major&quot;)">
+    <property name="task.executed.revbump" value="true"/>
+  </target>
+
+</project>

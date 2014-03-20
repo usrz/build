@@ -73,9 +73,14 @@
           unless="task.executed.publish">
     <property name="task.executed.publish" value="true"/>
 
+    <fail unless="ivy.buildNumber"
+          message="Property &quot;ivy.buildNumber&quot; not specified"/>
+
+    <fail message="${ivy.revision}.${ivy.buildNumber}"/>
+
     <ivy:publish resolver="publications"
                  forcedeliver="true"
-                 pubrevision="${ivy.revision.publish}"
+                 pubrevision="${ivy.revision}.${ivy.buildNumber}"
                  pubdate="${ivy.timestamp}"
                  conf="*(public)">
        <artifacts pattern="${targetdir}/archives/[artifact]-[type].[ext]" />
