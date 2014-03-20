@@ -77,7 +77,7 @@
           message="Property &quot;ivy.buildNumber&quot; not specified"/>
 
     <!-- Tag and push tags always (even in case of failure) -->
-    <echo message="Pushing changes back to origin"/>
+    <echo message="Tagging release ${ivy.revision}.${ivy.buildNumber}"/>
     <exec failonerror="true" executable="git">
       <arg value="tag"/>
       <arg value="-a"/>
