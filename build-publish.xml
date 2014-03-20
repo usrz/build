@@ -83,6 +83,7 @@
       <arg value="-a"/>
       <arg value="-m"/>
       <arg value="Release ${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="${ivy.revision}.${ivy.buildNumber}"/>
     </exec>
     <exec failonerror="true" executable="git">
       <arg value="push"/>
