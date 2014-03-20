@@ -29,9 +29,9 @@ done
 
 REVISION=""
 while test -z "${REVISION}" ; do
-  echo -n -e '     \033[32mRevision\033[0m [\033[33m0.0.0\033[0m]: '
+  echo -n -e '     \033[32mRevision\033[0m [\033[33m0.0\033[0m]: '
   read -e REVISION || { echo ; continue; }
-  if test -z "${REVISION}" ; then REVISION="0.0.0" ; fi
+  if test -z "${REVISION}" ; then REVISION="0.0" ; fi
 done
 
 # Let's go!
@@ -127,10 +127,12 @@ deployment:
   release:
     branch: release
     commands:
+      - git config user.email "builds@circleci.com"
+      - git config user.name "CircleCI Buil Agent"
       - ant publish
           -Dtask.executed.test=true
           -Divy.useCacheOnly=true
-          -Divy.status=release
+          -Divy.buildNumber=${CIRCLE_BUILD_NUM}
       - (cd target/publications && scp -r . circleci@dev.usrz.com:releases)
 EOF
 
