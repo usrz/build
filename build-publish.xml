@@ -76,8 +76,21 @@
     <fail unless="ivy.buildNumber"
           message="Property &quot;ivy.buildNumber&quot; not specified"/>
 
-    <fail message="${ivy.revision}.${ivy.buildNumber}"/>
+    <!-- Tag and push tags always (even in case of failure) -->
+    <echo message="Pushing changes back to origin"/>
+    <exec failonerror="true" executable="git">
+      <arg value="tag"/>
+      <arg value="-a"/>
+      <arg value="-m"/>
+      <arg value="Release ${ivy.revision}.${ivy.buildNumber}"/>
+    </exec>
+    <exec failonerror="true" executable="git">
+      <arg value="push"/>
+      <arg value="origin"/>
+      <arg value="--tags"/>
+    </exec>
 
+    <!-- Publish via Ivy -->
     <ivy:publish resolver="publications"
                  forcedeliver="true"
                  pubrevision="${ivy.revision}.${ivy.buildNumber}"
