@@ -96,6 +96,7 @@
                  forcedeliver="true"
                  pubrevision="${ivy.revision}.${ivy.buildNumber}"
                  pubdate="${ivy.timestamp}"
+                 status="release"
                  conf="*(public)">
        <artifacts pattern="${targetdir}/archives/[artifact]-[type].[ext]" />
     </ivy:publish>
