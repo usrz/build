@@ -17,6 +17,11 @@
 
 <project xmlns:ivy="antlib:org.apache.ivy.ant">
 
+  <echo taskname="jvm:configure" message=":: Java Platform version ${java.version}"/>
+  <echo taskname="jvm:configure" message=":: ${java.runtime.name} (build ${java.runtime.version})"/>
+  <echo taskname="jvm:configure" message=":: ${java.vm.name} (build ${java.vm.version}, ${java.vm.info})"/>
+  <echo taskname="ant:configure" message=":: ${ant.version}"/>
+
   <!-- Basic directory properties -->
   <property name="builddir" value="${basedir}/build" />
   <property name="sourcedir" value="${basedir}/source" />
