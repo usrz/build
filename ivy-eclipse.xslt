@@ -83,6 +83,7 @@
           <xsl:if test="(../@name='guice') and (../@organisation='com.google')">
             <accessrules>
               <accessrule kind="discouraged" pattern="com/google/inject/Inject"/>
+              <accessrule kind="discouraged" pattern="com/google/inject/Provider"/>
               <accessrule kind="discouraged" pattern="com/google/inject/Singleton"/>
               <accessrule kind="discouraged" pattern="com/google/inject/name/Named"/>
             </accessrules>
