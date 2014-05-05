@@ -102,4 +102,33 @@
     </ivy:publish>
   </target>
 
+  <!--+====================================================================+
+      | BUILD A WEB-APPLICATION EXPANDED WAR                               |
+      +=================================================================== + -->
+
+  <target name="webapp"
+          depends="compile,test"
+          description="Create a WAR directory structure"
+          unless="task.executed.webapp">
+    <property name="task.executed.webapp" value="true"/>
+
+    <mkdir dir="${targetdir}/webapp"/>
+    <copy todir="${targetdir}/webapp"
+          includeEmptyDirs="false">
+      <fileset dir="${sourcedir}/web"/>
+    </copy>
+
+    <mkdir dir="${targetdir}/webapp/WEB-INF/classes"/>
+    <copy todir="${targetdir}/webapp/WEB-INF/classes"
+          includeEmptyDirs="false">
+      <fileset dir="${targetdir}/main"/>
+    </copy>
+
+    <mkdir dir="${targetdir}/webapp/WEB-INF/lib"/>
+    <ivy:retrieve pattern="${targetdir}/webapp/WEB-INF/lib/[organisation].[artifact]-[revision]-[type].[ext]"
+                  type="bin"/>
+  </target>
+
+
+
 </project>
