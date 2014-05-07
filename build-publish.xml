@@ -67,11 +67,12 @@
       | DELIVER AND PUBLISH IVY MODULE                                     |
       +=================================================================== + -->
 
-  <target name="publish"
-          depends="test,publish.archive"
-          description="Publish the Ivy module artifacts"
-          unless="task.executed.publish">
-    <property name="task.executed.publish" value="true"/>
+  <!-- Tag the build -->
+  <target name="tag"
+          depends="test"
+          description="Tag the current version"
+          unless="task.executed.tag">
+    <property name="task.executed.tag" value="true"/>
 
     <fail unless="ivy.buildNumber"
           message="Property &quot;ivy.buildNumber&quot; not specified"/>
@@ -90,8 +91,15 @@
       <arg value="origin"/>
       <arg value="--tags"/>
     </exec>
+  </target>
 
-    <!-- Publish via Ivy -->
+  <!-- Publish via Ivy -->
+  <target name="publish"
+          depends="test,tag,publish.archive"
+          description="Publish the Ivy module artifacts"
+          unless="task.executed.publish">
+    <property name="task.executed.publish" value="true"/>
+
     <ivy:publish resolver="publications"
                  forcedeliver="true"
                  pubrevision="${ivy.revision}.${ivy.buildNumber}"
