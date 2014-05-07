@@ -17,11 +17,35 @@
 
 <project xmlns:ivy="antlib:org.apache.ivy.ant">
 
-  <target name="test"
+
+  <!--+====================================================================+
+      | FIGURE OUT IF THERE ARE TESTS AVAILABLE                            |
+      +=================================================================== + -->
+  <target name="test.available"
           depends="compile"
-          description="Run TestNG tests"
-          unless="task.executed.test">
-    <property name="task.executed.test" value="true"/>
+          unless="task.executed.test.available">
+    <property name="task.executed.test.available" value="true"/>
+
+    <!-- Fileset of all our tests -->
+    <fileset id="test.fileset"
+             dir="${targetdir}/test"
+             includes="**/*Test.class" />
+
+    <!-- Set "test.available" if we have 1 or more tests -->
+    <condition property="test.available">
+      <resourcecount refid="test.fileset" when="gt" count="0" />
+    </condition>
+  </target>
+
+
+  <!--+====================================================================+
+      | INVOKE TESTNG ONLY IF THERE ARE TESTS AVAILABLE                    |
+      +=================================================================== + -->
+  <target name="test.execute"
+          depends="test.available"
+          unless="task.executed.test.execute"
+          if="test.available">
+    <property name="task.executed.test.execute" value="true"/>
 
     <!-- Cache the path for TestNG (latest) to define our task -->
     <ivy:cachepath organisation="org.testng"
@@ -47,13 +71,22 @@
 
     <!-- Run tests -->
     <testng classpathref="classpath.testing.execute"
+            classfilesetref="test.fileset"
             outputDir="${targetdir}/testng"
             excludedgroups="local"
             haltOnFailure="true"
             suitename="suite"
-            verbose="2">
-      <classfileset dir="${targetdir}/test"
-                    includes="**/*Test.class" />
-    </testng>
+            verbose="2"/>
+  </target>    
+
+  <!--+====================================================================+
+      | CHECK FOR TESTS AND INVOKE TESTNG IF NECESSARY                     |
+      +=================================================================== + -->
+  <target name="test"
+          depends="test.available,test.execute"
+          description="Run TestNG tests"
+          unless="task.executed.test">
+    <property name="task.executed.test" value="true"/>
+
   </target>
 </project>
