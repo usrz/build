@@ -36,7 +36,7 @@
             use="true"
             classpathref="classpath.compile">
         <link href="http://docs.oracle.com/javase/7/docs/api/"/>
-        <arg value="-Xdoclint:all,-missing"/>
+        <!-- arg value="-Xdoclint:all,-missing"/ -->
       </javadoc>
   </target>
 
