@@ -41,6 +41,10 @@
   <!--+====================================================================+
       | INVOKE TESTNG ONLY IF THERE ARE TESTS AVAILABLE                    |
       +=================================================================== + -->
+  <condition property="task.executed.test.execute">
+    <isset property="test.skip"/>
+  </condition>
+
   <target name="test.execute"
           depends="test.available"
           unless="task.executed.test.execute"
