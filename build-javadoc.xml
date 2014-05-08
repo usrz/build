@@ -29,14 +29,28 @@
   <target name="javadoc.generate"
           unless="task.executed.javadoc.generate">
     <property name="task.executed.javadoc.generate" value="true"/>
+
+    <!-- Switch between JDK 7 and 8 -->
+    <condition property="javadoc.extra"
+               value="-Xdoclint:all,-missing"
+               else="-quiet">
+      <matches string="${ant.java.version}" pattern="^1\.8" />
+    </condition>
+    <condition property="javadoc.link"
+               value="http://docs.oracle.com/javase/8/docs/api/"
+               else="http://docs.oracle.com/javase/7/docs/api/">
+      <matches string="${ant.java.version}" pattern="^1\.8" />
+    </condition>
+
+    <!-- Invoke the JavaDOC tool -->
     <javadoc sourcepath="${sourcedir}/main"
             destdir="${targetdir}/docs"
             author="true"
             version="true"
             use="true"
             classpathref="classpath.compile">
-        <link href="http://docs.oracle.com/javase/7/docs/api/"/>
-        <!-- arg value="-Xdoclint:all,-missing"/ -->
+        <link href="${javadoc.link}"/>
+        <arg value="${javadoc.extra}" />
       </javadoc>
   </target>
 
