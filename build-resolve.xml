@@ -53,6 +53,9 @@
     <ivy:cachepath pathid="classpath.testing"
                    conf="testing"
                    type="bin" />
+    <ivy:cachepath pathid="classpath.default"
+                   conf="default"
+                   type="bin" />
 
     <!-- Calculate a timestamp for publishing -->
     <tstamp>
@@ -76,6 +79,4 @@
           out="${basedir}/.classpath" />
   </target>
 
-
 </project>
-
