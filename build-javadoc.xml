@@ -17,23 +17,63 @@
 
 <project>
 
+  <!-- Check if we have to run JavaDOC and if we have Lombok -->
   <target name="javadoc.check"
           unless="task.executed.javadoc.check">
     <property name="task.executed.javadoc.check" value="true"/>
+
     <uptodate property="task.executed.javadoc.generate">
       <srcfiles dir= "${sourcedir}/main" includes="**/*"/>
       <mapper type="merge" to="${targetdir}/docs/index.html"/>
     </uptodate>
+
+    <condition property="task.executed.javadoc.lombok">
+      <or>
+        <isset property="task.executed.javadoc.generate" />
+        <not>
+          <available classname="lombok.core.Main"
+                     classpathref="classpath.compile" />
+        </not>
+      </or>
+    </condition>
+
+  </target>
+
+  <!-- Run Lombok if we have to -->
+  <target name="javadoc.lombok"
+          unless="task.executed.javadoc.lombok">
+    <property name="task.executed.javadoc.lombok" value="true"/>
+    <mkdir dir="${sourcedoc}"/>
+
+    <!-- Specify where sources for JavaDOC are found -->
+    <property name="sourcedoc" value="${targetdir}/lombok"/>
+
+    <!-- Define the Delombok Task -->
+    <taskdef classname="lombok.delombok.ant.DelombokTask"
+             classpathref="classpath.compile"
+             name="delombok" />
+
+    <!-- Create the lombok target directory and run it -->
+    <delombok verbose="true"
+              encoding="UTF-8"
+              to="${sourcedoc}"
+              from="${sourcedir}/main"
+              classpathref="classpath.compile">
+      <format value="suppressWarnings:skip" />
+    </delombok>
   </target>
 
   <target name="javadoc.generate"
           unless="task.executed.javadoc.generate">
     <property name="task.executed.javadoc.generate" value="true"/>
 
+    <!-- If not already specified in Lombok, sources directory -->
+    <property name="sourcedoc" value="${sourcedir}/main"/>
+
     <!-- Switch between JDK 7 and 8 -->
     <condition property="javadoc.extra"
                value="-Xdoclint:all,-missing"
-               else="-quiet">
+               else="-quiet" >
       <matches string="${ant.java.version}" pattern="^1\.8" />
     </condition>
     <condition property="javadoc.link"
@@ -43,13 +83,13 @@
     </condition>
 
     <!-- Invoke the JavaDOC tool -->
-    <javadoc sourcepath="${sourcedir}/main"
-            destdir="${targetdir}/docs"
-            author="true"
-            version="true"
-            use="true"
-            classpathref="classpath.compile">
-        <link href="${javadoc.link}"/>
+    <javadoc sourcepath="${sourcedoc}"
+             destdir="${targetdir}/docs"
+             classpathref="classpath.compile"
+             author="true"
+             version="true"
+             use="true" >
+        <link href="${javadoc.link}" />
         <arg value="${javadoc.extra}" />
       </javadoc>
   </target>
@@ -58,7 +98,7 @@
       | JAVADOC GENERATION                                                 |
       +=================================================================== + -->
   <target name="javadoc"
-          depends="resolve,javadoc.check,javadoc.generate"
+          depends="resolve,javadoc.check,javadoc.lombok,javadoc.generate"
           description="Prepare JavaDOC of main sources"
           unless="task.executed.javadoc">
     <property name="task.executed.javadoc" value="true"/>
