@@ -43,7 +43,6 @@
   <target name="javadoc.lombok"
           unless="task.executed.javadoc.lombok">
     <property name="task.executed.javadoc.lombok" value="true"/>
-    <mkdir dir="${sourcedoc}"/>
 
     <!-- Specify where sources for JavaDOC are found -->
     <property name="sourcedoc" value="${targetdir}/lombok"/>
@@ -54,6 +53,7 @@
              name="delombok" />
 
     <!-- Create the lombok target directory and run it -->
+    <mkdir dir="${sourcedoc}"/>
     <delombok verbose="true"
               encoding="UTF-8"
               to="${sourcedoc}"
