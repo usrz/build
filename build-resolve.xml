@@ -79,4 +79,24 @@
           out="${basedir}/.classpath" />
   </target>
 
+  <!-- Dump a class path to a file -->
+  <target name="classpath"
+          depends="resolve"
+          description="Create a set of .classpath.[mode].txt files"
+          unless="task.executed.classpath">
+    <property name="task.executed.classpath" value="true"/>
+
+    <echo>Creating ${basedir}/.classpath.compile.txt</echo>
+    <pathconvert pathsep="${line.separator}" property="classpath.compile.txt" refid="classpath.compile"/>
+    <echo file="${basedir}/.classpath.compile.txt">${classpath.compile.txt}${line.separator}</echo>
+
+    <echo>Creating ${basedir}/.classpath.testing.txt</echo>
+    <pathconvert pathsep="${line.separator}" property="classpath.testing.txt" refid="classpath.testing"/>
+    <echo file="${basedir}/.classpath.testing.txt">${classpath.testing.txt}${line.separator}</echo>
+
+    <echo>Creating ${basedir}/.classpath.default.txt</echo>
+    <pathconvert pathsep="${line.separator}" property="classpath.default.txt" refid="classpath.default"/>
+    <echo file="${basedir}/.classpath.default.txt">${classpath.default.txt}${line.separator}${targetdir}/main${line.separator}</echo>
+  </target>
+
 </project>
