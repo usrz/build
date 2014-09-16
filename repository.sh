@@ -5,9 +5,6 @@ if test -z "${GITHUB_API_TOKEN}" ; then
   exit 1
 fi
 
-git config user.email "builds@circleci.com" || exit 1
-git config user.name "CircleCI Buil Agent" || exit 1
-
 echo ""
 echo "Checking out Repository:"
 echo ""
@@ -17,6 +14,12 @@ git clone \
   "https://git:${GITHUB_API_TOKEN}@github.com/usrz/repository.git" \
   "target/repository" || exit 1
 cd "target/repository"
+echo ""
+echo "Repository at revision:"
+echo ""
+git rev-parse HEAD || exit 1
+git config user.email "builds@circleci.com" || exit 1
+git config user.name "CircleCI Buil Agent" || exit 1
 
 OLD_DIR=`pwd`;
 for DIR in releases libraries ; do
