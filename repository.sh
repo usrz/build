@@ -90,7 +90,7 @@ else
   echo ""
   echo "Pushing changes:"
   echo ""
-  git push origin gh-pages || exit 1
+  git push --quiet origin gh-pages || exit 1
 fi
 echo ""
 echo "Cleaning up:"
