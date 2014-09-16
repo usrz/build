@@ -129,7 +129,7 @@
     <exec failonerror="true" executable="node" outputproperty="node.version">
       <arg value="-v"/>
     </exec>
-    <acho message="Node version: ${node.version}"/>
+    <echo message="Node version: ${node.version}"/>
 
     <!-- Create release -->
     <exec failonerror="true" executable="node">
