@@ -25,7 +25,7 @@
     <!-- Check for local modifications -->
     <echo message="Checking for local modifications"/>
     <exec executable="git" resultproperty="git.check.1">
-      <arg value="diff"/> 
+      <arg value="diff"/>
       <arg value="--cached"/>
       <arg value="--quiet"/>
     </exec>

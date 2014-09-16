@@ -19,7 +19,7 @@
 
   <!--+====================================================================+
       | PREPARE ARCHIVES FOR A FULL DISTRIBUTION                           |
-      +=================================================================== + -->
+      +====================================================================+ -->
 
   <!-- Archive sources -->
   <target name="publish.archive.sources"
@@ -62,10 +62,55 @@
           unless="task.executed.publish.archive">
     <property name="task.executed.publish.archive" value="true"/>
   </target>
-    
+
   <!--+====================================================================+
-      | DELIVER AND PUBLISH IVY MODULE                                     |
-      +=================================================================== + -->
+      | PUBLISH ARCHIVES ON GITHUB AS A NEW RELEASE                        |
+      +====================================================================+ -->
+
+  <!-- Publish on GitHub -->
+  <target name="publish.github"
+          depends="tag,publish.archive"
+          unless="task.executed.publish.github">
+    <property name="task.executed.publish.github" value="true"/>
+
+    <exec failonerror="true" executable="node">
+      <arg value="${builddir}/githubber.js"/>
+      <arg value="release"/>
+      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--body=Release ${ivy.revision}.${ivy.buildNumber}"/>
+    </exec>
+
+    <exec failonerror="true" executable="node" logError="true" outputproperty="github.src.url">
+      <arg value="${builddir}/githubber.js"/>
+      <arg value="asset"/>
+      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--file=${targetdir}/archives/${ivy.module}-src.zip"/>
+      <arg value="--file-name=${ivy.organisation}-${ivy.module}-${ivy.revision}.${ivy.buildNumber}-src.zip"/>
+    </exec>
+    <echo message="GitHub sources: ${github.src.url}"/>
+
+    <exec failonerror="true" executable="node" logError="true" outputproperty="github.doc.url">
+      <arg value="${builddir}/githubber.js"/>
+      <arg value="asset"/>
+      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--file=${targetdir}/archives/${ivy.module}-doc.zip"/>
+      <arg value="--file-name=${ivy.organisation}-${ivy.module}-${ivy.revision}.${ivy.buildNumber}-doc.zip"/>
+    </exec>
+    <echo message="GitHub javadoc: ${github.doc.url}"/>
+
+    <exec failonerror="true" executable="node" logError="true" outputproperty="github.bin.url">
+      <arg value="${builddir}/githubber.js"/>
+      <arg value="asset"/>
+      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--file=${targetdir}/archives/${ivy.module}-bin.jar"/>
+      <arg value="--file-name=${ivy.organisation}-${ivy.module}-${ivy.revision}.${ivy.buildNumber}-bin.jar"/>
+    </exec>
+    <echo message="GitHub classes: ${github.bin.url}"/>
+  </target>
+
+  <!--+====================================================================+
+      | TAG REPOSITORY AND PUSH TAGS BACK                                  |
+      +====================================================================+ -->
 
   <!-- Tag the build -->
   <target name="tag"
@@ -93,13 +138,18 @@
     </exec>
   </target>
 
-  <!-- Publish via Ivy -->
-  <target name="publish"
-          depends="test,tag,publish.archive"
-          description="Publish the Ivy module artifacts"
-          unless="task.executed.publish">
-    <property name="task.executed.publish" value="true"/>
+  <!--+====================================================================+
+      | IVY PUBLISHING                                                     |
+      +====================================================================+ -->
 
+  <!-- Publish via Ivy -->
+  <target name="publish.ivy"
+          depends="publish.archive,publish.github"
+          description="Publish the Ivy module artifacts"
+          unless="task.executed.publish.ivy">
+    <property name="task.executed.publish.ivy" value="true"/>
+
+    <!-- Publish our Ivy files -->
     <ivy:publish resolver="publications"
                  forcedeliver="true"
                  pubrevision="${ivy.revision}.${ivy.buildNumber}"
@@ -108,35 +158,45 @@
                  conf="*(public)">
        <artifacts pattern="${targetdir}/archives/[artifact]-[type].[ext]" />
     </ivy:publish>
+
+    <!-- XSLT to insert artifact URLs -->
+    <xslt style="${builddir}/ivy-github.xslt"
+          in="${targetdir}/publications/${ivy.organisation}/${ivy.module}/${ivy.revision}.${ivy.buildNumber}/ivy.xml"
+          out="${targetdir}/ivy-github.xml">
+      <param name="src" expression="${github.src.url}"/>
+      <param name="doc" expression="${github.doc.url}"/>
+      <param name="bin" expression="${github.bin.url}"/>
+    </xslt>
   </target>
 
-  <!--+====================================================================+
-      | BUILD A WEB-APPLICATION EXPANDED WAR                               |
-      +=================================================================== + -->
+  <!-- Publish Ivy to GitHub -->
+  <target name="publish"
+          depends="test,tag,publish.ivy"
+          description="Publish the release to GitHub"
+          unless="task.executed.publish">
+    <property name="task.executed.publish" value="true"/>
 
-  <target name="webapp"
-          depends="compile,test"
-          description="Create a WAR directory structure"
-          unless="task.executed.webapp">
-    <property name="task.executed.webapp" value="true"/>
+    <!-- Upload ivy.xml to GitHub as an asset -->
+    <exec failonerror="true" executable="node" logError="true" outputproperty="github.ivy.url">
+      <arg value="${builddir}/githubber.js"/>
+      <arg value="asset"/>
+      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--file=${targetdir}/ivy-github.xml"/>
+      <arg value="--file-name=ivy.xml"/>
+    </exec>
+    <echo message="GitHub ivy.xml: ${github.bin.url}"/>
 
-    <mkdir dir="${targetdir}/webapp"/>
-    <copy todir="${targetdir}/webapp"
-          includeEmptyDirs="false">
-      <fileset dir="${sourcedir}/web"/>
-    </copy>
+    <!-- Upload ivy.xml to GitHub in our repository -->
+    <exec failonerror="true" executable="node" logError="true">
+      <arg value="${builddir}/githubber.js"/>
+      <arg value="upload"/>
+      <arg value="--owner=usrz"/>
+      <arg value="--repo=repository"/>
+      <arg value="--file=${targetdir}/ivy-github.xml"/>
+      <arg value="--path=releases/${ivy.organisation}/${ivy.module}/${ivy.revision}.${ivy.buildNumber}/ivy.xml"/>
+      <arg value="--message=Built ${ivy.organisation}-${ivy.module} revision ${ivy.revision}.${ivy.buildNumber}"/>
+    </exec>
 
-    <mkdir dir="${targetdir}/webapp/WEB-INF/classes"/>
-    <copy todir="${targetdir}/webapp/WEB-INF/classes"
-          includeEmptyDirs="false">
-      <fileset dir="${targetdir}/main"/>
-    </copy>
-
-    <mkdir dir="${targetdir}/webapp/WEB-INF/lib"/>
-    <ivy:retrieve pattern="${targetdir}/webapp/WEB-INF/lib/[organisation].[artifact]-[revision]-[type].[ext]"
-                  type="bin"/>
   </target>
-
-
 
 </project>
