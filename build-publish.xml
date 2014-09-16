@@ -125,6 +125,12 @@
           unless="task.executed.publish.github">
     <property name="task.executed.publish.github" value="true"/>
 
+    <!-- Dump out Node's version -->
+    <exec failonerror="true" executable="node" outputproperty="node.version">
+      <arg value="-v"/>
+    </exec>
+    <acho message="Node version: ${node.version}"/>
+
     <!-- Create release -->
     <exec failonerror="true" executable="node">
       <arg value="${builddir}/githubber.js"/>
@@ -141,7 +147,6 @@
       <arg value="--file=${targetdir}/archives/${ivy.module}-src.zip"/>
       <arg value="--file-name=sources-${ivy.revision}.${ivy.buildNumber}.zip"/>
     </exec>
-    <echo message="GitHub sources: ${github.src.url}"/>
 
     <!-- Upload documentation -->
     <exec failonerror="true" executable="node" logError="true" outputproperty="github.doc.url">
@@ -151,7 +156,6 @@
       <arg value="--file=${targetdir}/archives/${ivy.module}-doc.zip"/>
       <arg value="--file-name=javadoc-${ivy.revision}.${ivy.buildNumber}.zip"/>
     </exec>
-    <echo message="GitHub javadoc: ${github.doc.url}"/>
 
     <!-- Upload classes -->
     <exec failonerror="true" executable="node" logError="true" outputproperty="github.bin.url">
@@ -161,7 +165,6 @@
       <arg value="--file=${targetdir}/archives/${ivy.module}-bin.jar"/>
       <arg value="--file-name=classes-${ivy.revision}.${ivy.buildNumber}.jar"/>
     </exec>
-    <echo message="GitHub classes: ${github.bin.url}"/>
 
     <!-- XSLT to insert artifact URLs -->
     <xslt style="${builddir}/ivy-github.xslt"
@@ -180,7 +183,11 @@
       <arg value="--file=${targetdir}/ivy-github.xml"/>
       <arg value="--file-name=ivy.xml"/>
     </exec>
+
     <echo message="GitHub ivy.xml: ${github.ivy.url}"/>
+    <echo message="GitHub classes: ${github.bin.url}"/>
+    <echo message="GitHub sources: ${github.src.url}"/>
+    <echo message="GitHub javadoc: ${github.doc.url}"/>
 
     <!-- Publish ivy.xml in our repository -->
     <exec failonerror="true" executable="node" logError="true">
