@@ -64,17 +64,21 @@ function error() {
   process.exit(1);
 }
 
-function failure(error, status) {
-  if (status) {
-    console.error("An HTTP/%d error occurred", status);
-  } else {
-    console.error("An error occurred");
+process.on('uncaughtException', function (error) {
+  console.error("An error occurred");
+  console.error(error.stack);
+  for (var i in error) {
+    console.error(i + '=' + JSON.stringify(error[i], undefined, 4));
   }
-  if (error) {
-    if (typeof(error) === 'string') console.error(error);
-    else console.error(JSON.stringify(error, undefined, 2));
-  }
-  process.exit(1);
+  process.exit(2);
+});
+
+function httpError(status, headers, response) {
+  var error = new Error("An HTTP/" + status + " error occurred");
+  error.status = status;
+  error.headers = headers;
+  error.response = response;
+  return error;
 }
 
 /* ========================================================================== */
@@ -153,7 +157,7 @@ function release() {
     response.setEncoding('utf8');
     response.on('data', function (chunk) { body = body + chunk; });
     response.on('end',  function () { released(status, headers, JSON.parse(body)) });
-  }).on('error', failure);
+  });
 
   request.write(JSON.stringify(release));
   request.end();
@@ -161,7 +165,7 @@ function release() {
   /* ======================================================================== */
 
   function released(status, headers, response) {
-    if (status != 201) return failure(response, status);
+    if (status != 201) throw new Error("HTTP Error " + status + "\n" + JSON.stringify(response));
 
     console.error("Release '%s' (id=%d) available at %s", tag, response.id, response.html_url);
     process.exit(0);
@@ -193,20 +197,16 @@ function asset() {
     case '.jar':  content = 'application/java-archive'; break;
   }
   content = option('content-type', content);
-  var size;
 
-  try {
-    var fd = fs.openSync(file, 'r');
-    var stat = fs.fstatSync(fd);
-    if (stat.isFile()) {
-      size = stat.size;
-    } else {
-      failure("Path '" + file + "' is not a file");
-    }
-    fs.closeSync(fd);
-  } catch (error) {
-    failure(error);
+  var size;
+  var fd = fs.openSync(file, 'r');
+  var stat = fs.fstatSync(fd);
+  if (stat.isFile()) {
+    size = stat.size;
+  } else {
+    throw new Error("Path '" + file + "' is not a file");
   }
+  fs.closeSync(fd);
 
   console.error("Uploading file '%s' (%d bytes) for release '%s' of https://github.com/%s/%s", filename, size, tag, owner, repo);
 
@@ -228,14 +228,14 @@ function asset() {
     response.setEncoding('utf8');
     response.on('data', function (chunk) { body = body + chunk; });
     response.on('end',  function () { listed(status, headers, JSON.parse(body)) });
-  }).on('error', failure);
+  });
 
   request.end();
 
   /* ======================================================================== */
 
   function listed(status, headers, response) {
-    if (status != 200) return failure(response, status);
+    if (status != 200) throw httpError(status, headers, response);
 
     for (var i in response) {
       if (response[i].tag_name == tag) {
@@ -244,7 +244,7 @@ function asset() {
       }
     }
 
-    failure("ID for release '" + tag + "' not found");
+    throw new Error("ID for release '" + tag + "' not found");
   };
 
   /* ======================================================================== */
@@ -270,18 +270,17 @@ function asset() {
       response.setEncoding('utf8');
       response.on('data', function (chunk) { body = body + chunk; });
       response.on('end',  function () { uploaded(status, headers, JSON.parse(body)) });
-    }).on('error', failure);
+    });
 
     fs.createReadStream(file)
       .on('open', function() { process.stderr.write("Writing...") })
       .on('data', function() { process.stderr.write(".")          })
       .on('end',  function() { process.stderr.write(". Done!")    })
-      .on('error', failure)
       .pipe(request);
 
     function uploaded(status, headers, response) {
       process.stderr.write("\n");
-      if (status != 201) return failure(response, status);
+      if (status != 201) throw httpError(status, headers, response);
       process.stdout.write(response.browser_download_url + "\n");
       process.exit(0);
     }
@@ -300,12 +299,7 @@ function upload() {
   var message = option('message');
   var branch = option('branch', 'master');
 
-  var content;
-  try {
-    content = fs.readFileSync(file, {encoding: 'base64'});
-  } catch (error) {
-    failure(error);
-  }
+  var content = fs.readFileSync(file, {encoding: 'base64'});
 
   var details = {
     message: message,
@@ -333,7 +327,7 @@ function upload() {
     response.setEncoding('utf8');
     response.on('data', function (chunk) { body = body + chunk; });
     response.on('end',  function () { uploaded(status, headers, JSON.parse(body)) });
-  }).on('error', failure);
+  });
 
   request.write(JSON.stringify(details));
   request.end();
@@ -341,9 +335,8 @@ function upload() {
   /* ======================================================================== */
 
   function uploaded(status, headers, response) {
-    if (status != 201) return failure(response, status);
+    if (status != 201) throw httpError(status, headers, response);
     console.error("New file '%s' created as %s", response.content.path, response.commit.sha);
     process.exit(0);
   };
 };
-
