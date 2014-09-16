@@ -19,7 +19,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <!-- Make sure we encode this nicely -->
-  <xsl:strip-space elements="*" />
+  <xsl:strip-space elements="*"/>
   <xsl:output method="xml"
               encoding="UTF-8"
               omit-xml-declaration="no"
@@ -32,7 +32,6 @@
 
   <!-- Separate XML declaration from root node -->
   <xsl:template match="/">
-    <xsl:text>&#10;</xsl:text>
     <xsl:apply-templates select="ivy-module"/>
   </xsl:template>
 
@@ -42,6 +41,9 @@
       <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
+
+  <!-- Ignore comments -->
+  <xsl:template match="comment()"/>
 
   <!-- Update URLs for download -->
   <xsl:template match="/ivy-module/publications/artifact[@type='src']">
