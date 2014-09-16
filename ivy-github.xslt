@@ -19,6 +19,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <!-- Make sure we encode this nicely -->
+  <xsl:strip-space elements="*" />
   <xsl:output method="xml"
               encoding="UTF-8"
               omit-xml-declaration="no"
