@@ -82,11 +82,11 @@ done
 if git diff-index --quiet HEAD -- ; then
   echo ""
   echo "No changes (Skipping commit)"
-#else
+else
   echo ""
   echo "Committing:"
   echo ""
-  git commit --allow-empty --verbose -a -m "Built new indexes" || exit 1
+  git commit --verbose -a -m "Built new indexes" || exit 1
   echo ""
   echo "Pushing changes:"
   echo ""
