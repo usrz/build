@@ -283,6 +283,7 @@ function asset() {
       process.stderr.write("\n");
       if (status != 201) return failure(response, status);
       process.stdout.write(response.browser_download_url + "\n");
+      process.exit(0);
     }
   };
 };
@@ -342,6 +343,7 @@ function upload() {
   function uploaded(status, headers, response) {
     if (status != 201) return failure(response, status);
     console.error("New file '%s' created as %s", response.content.path, response.commit.sha);
+    process.exit(0);
   };
 };
 
