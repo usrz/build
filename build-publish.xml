@@ -121,7 +121,7 @@
 
   <!-- Publish on GitHub -->
   <target name="publish.github"
-          depends="publish.ivy,tag"
+          depends="publish.ivy"
           unless="task.executed.publish.github">
     <property name="task.executed.publish.github" value="true"/>
 
