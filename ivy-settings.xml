@@ -41,12 +41,6 @@
       <ivy      pattern="http://usrz.github.io/repository/releases/[organisation]/[module]/[revision]/ivy.xml" />
       <artifact pattern="http://usrz.github.io/repository/releases/[organisation]/[module]/[revision]/[artifact]-[revision]-[type].[ext]" />
     </url>
-
-    <!-- Where/how Jenkins publishes -->
-    <filesystem name="publications" checksums="">
-      <ivy      pattern="${ivy.publications}/${ivy.dirPattern}/ivy.xml" />
-      <artifact pattern="${ivy.publications}/${ivy.dirPattern}/[artifact]-[revision]-[type].[ext]" />
-    </filesystem>
   </resolvers>
 
   <!-- Specific resolvers to use for specific patterns -->
