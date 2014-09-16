@@ -158,7 +158,7 @@
     <echo message="GitHub javadoc: ${github.doc.url}"/>
 
     <!-- Publish ivy.xml in our repository -->
-    <exec failonerror="true" executable="node" logError="true">
+    <!--exec failonerror="true" executable="node" logError="true">
       <arg value="${builddir}/githubber.js"/>
       <arg value="upload"/>
       <arg value="--owner=usrz"/>
@@ -167,7 +167,7 @@
       <arg value="--file=${targetdir}/ivy-github.xml"/>
       <arg value="--path=releases/${ivy.organisation}/${ivy.module}/${ivy.revision}.${ivy.buildNumber}/ivy.xml"/>
       <arg value="--message=Built ${ivy.organisation}-${ivy.module} revision ${ivy.revision}.${ivy.buildNumber}"/>
-    </exec>
+    </exec-->
   </target>
 
   <!--+====================================================================+
