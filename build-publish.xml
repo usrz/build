@@ -18,6 +18,19 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <!--+====================================================================+
+      | VERSION                                                            |
+      +====================================================================+ -->
+  <target name="publish.version"
+          unless="task.executed.publish.version">
+    <property name="task.executed.publish.version" value="true"/>
+
+    <fail unless="ivy.revision">Missing "ivy.revision" property</fail>
+    <fail unless="ivy.buildNumber">Missing "ivy.buildNumber" property</fail>
+
+    <property name="publish.version" value="${ivy.revision}.${ivy.buildNumber}"/>
+  </target>
+
+  <!--+====================================================================+
       | PREPARE ARCHIVES FOR A FULL DISTRIBUTION                           |
       +====================================================================+ -->
 
@@ -69,14 +82,14 @@
 
   <!-- Publish via Ivy -->
   <target name="publish.ivy"
-          depends="test,publish.archive"
+          depends="test,publish.version,publish.archive"
           description="Publish the Ivy module artifacts"
           unless="task.executed.publish.ivy">
     <property name="task.executed.publish.ivy" value="true"/>
 
     <!-- Publish our Ivy files -->
     <ivy:deliver deliverpattern="${targetdir}/ivy-release.xml"
-                 pubrevision="${ivy.revision}.${ivy.buildNumber}"
+                 pubrevision="${publish.version}"
                  pubdate="${ivy.timestamp}"
                  status="release"
                  conf="*(public)"/>
@@ -89,7 +102,7 @@
 
   <!-- Publish on GitHub -->
   <target name="publish.github"
-          depends="test,publish.ivy"
+          depends="test,publish.version,publish.ivy"
           unless="task.executed.publish.github">
     <property name="task.executed.publish.github" value="true"/>
 
@@ -103,35 +116,35 @@
     <exec failonerror="true" executable="node">
       <arg value="${builddir}/githubber.js"/>
       <arg value="release"/>
-      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
-      <arg value="--body=Release ${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--tag=${publish.version}"/>
+      <arg value="--body=Release ${publish.version}"/>
     </exec>
 
     <!-- Upload sources -->
     <exec failonerror="true" executable="node" logError="true" outputproperty="github.src.url">
       <arg value="${builddir}/githubber.js"/>
       <arg value="asset"/>
-      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--tag=${publish.version}"/>
       <arg value="--file=${targetdir}/archives/${ivy.module}-src.zip"/>
-      <arg value="--file-name=sources-${ivy.revision}.${ivy.buildNumber}.zip"/>
+      <arg value="--file-name=sources-${publish.version}.zip"/>
     </exec>
 
     <!-- Upload documentation -->
     <exec failonerror="true" executable="node" logError="true" outputproperty="github.doc.url">
       <arg value="${builddir}/githubber.js"/>
       <arg value="asset"/>
-      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--tag=${publish.version}"/>
       <arg value="--file=${targetdir}/archives/${ivy.module}-doc.zip"/>
-      <arg value="--file-name=javadoc-${ivy.revision}.${ivy.buildNumber}.zip"/>
+      <arg value="--file-name=javadoc-${publish.version}.zip"/>
     </exec>
 
     <!-- Upload classes -->
     <exec failonerror="true" executable="node" logError="true" outputproperty="github.bin.url">
       <arg value="${builddir}/githubber.js"/>
       <arg value="asset"/>
-      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--tag=${publish.version}"/>
       <arg value="--file=${targetdir}/archives/${ivy.module}-bin.jar"/>
-      <arg value="--file-name=classes-${ivy.revision}.${ivy.buildNumber}.jar"/>
+      <arg value="--file-name=classes-${publish.version}.jar"/>
     </exec>
 
     <!-- XSLT to insert artifact URLs -->
@@ -147,7 +160,7 @@
     <exec failonerror="true" executable="node" logError="true" outputproperty="github.ivy.url">
       <arg value="${builddir}/githubber.js"/>
       <arg value="asset"/>
-      <arg value="--tag=${ivy.revision}.${ivy.buildNumber}"/>
+      <arg value="--tag=${publish.version}"/>
       <arg value="--file=${targetdir}/ivy-github.xml"/>
       <arg value="--file-name=ivy.xml"/>
     </exec>
