@@ -28,9 +28,6 @@ git config user.email "builds@circleci.com" || exit 1
 git config user.name "CircleCI Buil Agent" || exit 1
 git rev-parse HEAD || exit 1
 
-cat .git/credentials
-cat .git/config
-
 echo ""
 echo "Gathering parameters and copying Ivy descriptor:"
 echo ""
