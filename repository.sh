@@ -4,23 +4,32 @@ if test -z "${GITHUB_API_TOKEN}" ; then
   echo "Missing variable GITHUB_API_TOKEN"
   exit 1
 fi
+echo
 
+# Un-authenticated GIT checkout
 echo ""
 echo "Checking out Repository:"
 echo ""
 git clone \
+  --verbose \
   --depth 1 \
   --branch "gh-pages" \
-  "https://git:${GITHUB_API_TOKEN}@github.com/usrz/repository.git" \
+  "https://git@github.com/usrz/repository.git" \
   "target/repository" || exit 1
-cd "target/repository"
+cd "target/repository" || exit 1
 
+# Configure the repository
 echo ""
-echo "Repository at revision:"
+echo "Configuring repository at revision:"
 echo ""
-git rev-parse HEAD || exit 1
+echo "https://git:${GITHUB_API_TOKEN}@github.com" > "${PWD}/.git/credentials"
+git config credential.helper "store --file=\"${PWD}/.git/credentials\"" || exit 1
 git config user.email "builds@circleci.com" || exit 1
 git config user.name "CircleCI Buil Agent" || exit 1
+git rev-parse HEAD || exit 1
+
+cat .git/credentials
+cat .git/config
 
 echo ""
 echo "Gathering parameters and copying Ivy descriptor:"
@@ -32,53 +41,10 @@ echo "      revision=${revision}"
 mkdir -p "releases/${organisation}/${module}/${revision}" || exit 1
 cp "../ivy-github.xml" "releases/${organisation}/${module}/${revision}/ivy.xml" || exit 1
 
-OLD_DIR=`pwd`;
-for DIR in releases libraries ; do
-  echo ""
-  echo "Processing directory \"${DIR}\""
-  echo ""
-  echo "Recreating files:"
-  echo ""
-  find "${DIR}" -type f -name index.html -delete
-  find "${DIR}" -type d  -empty -print -delete
-  find "${DIR}" -type d | while read NEW_DIR ; do
-    echo -n .
-    cd "${NEW_DIR}"
-    {
-      echo "<!DOCTYPE html>"
-      echo "<html>"
-      echo "  <head>"
-      echo "    <title>Index of: ${NEW_DIR}</title>"
-      echo "  </head>"
-      echo "  <body>"
-      echo "    <h1>Index of: ${NEW_DIR}</h1>"
-      echo "    <ul>"
-      echo "      <li class=\"up\"><a href=\"..\">..</a></li>"
-      for FILE in `ls -1` ; do
-        if [[ $FILE == "index.html" ]] || [[ $FILE == .* ]] ; then
-          continue
-        fi
-        if test -d "$FILE" ; then
-          FILE="${FILE}/"
-          CLASS="dir"
-        else
-          CLASS="file"
-        fi
-        printf "      <li class=\"%s\"><a href=\"%s\">%s</a></li>\n" "${CLASS}" "${FILE}" "${FILE}"
-      done
-      echo "    </ul>"
-      echo "  </body>"
-      echo "</html>"
-    } > index.html
-    cd "${OLD_DIR}"
-  done
-  echo ". Done!"
-  echo ""
-  echo "Adding to git:"
-  echo ""
-  git add --verbose "${DIR}" || exit 1
-done
+# Call "make_indexes.sh" to generate the pages
+bash ./make_indexes.sh || exit 1
 
+# Now figure out if there's anything to commit
 if git diff-index --quiet HEAD -- ; then
   echo ""
   echo "No changes (Skipping commit)"
@@ -86,12 +52,18 @@ else
   echo ""
   echo "Committing:"
   echo ""
-  git commit --verbose -a -m "Built new indexes" || exit 1
+  if test -n "${CIRCLE_BUILD_NUM}" ; then
+    git commit --verbose -a -m "Built new indexes (${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} build ${CIRCLE_BUILD_NUM})" || exit 1
+  else
+    git commit --verbose -a -m "Built new indexes (on `hostname -f` at `date -u`)" || exit 1
+  fi
   echo ""
   echo "Pushing changes:"
   echo ""
-  git push --quiet origin gh-pages || exit 1
+  git push --verbose origin gh-pages || exit 1
 fi
+
+# And finally clean up this whole thing...
 echo ""
 echo "Cleaning up:"
 echo ""
