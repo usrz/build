@@ -31,7 +31,7 @@
       <or>
         <isset property="task.executed.javadoc.generate" />
         <not>
-          <available classname="lombok.core.Main"
+          <available classname="lombok.delombok.ant.Tasks$Delombok"
                      classpathref="classpath.compile" />
         </not>
       </or>
@@ -48,7 +48,7 @@
     <property name="sourcedoc" value="${targetdir}/lombok"/>
 
     <!-- Define the Delombok Task -->
-    <taskdef classname="lombok.delombok.ant.DelombokTask"
+    <taskdef classname="lombok.delombok.ant.Tasks$Delombok"
              classpathref="classpath.compile"
              name="delombok" />
 
